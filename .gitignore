@@ -145,3 +145,5 @@ datasets/*
 .DS_Store
 \wandb/
 \lightning_logs/
+*.idea
+\.idea/
