@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../jaxsw/.idea/jaxsw.iml" filepath="$PROJECT_DIR$/../jaxsw/.idea/jaxsw.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/jemanjjax.iml" filepath="$PROJECT_DIR$/.idea/jemanjjax.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../research_notebook/.idea/research_notebook.iml" filepath="$PROJECT_DIR$/../research_notebook/.idea/research_notebook.iml" />
+    </modules>
+  </component>
+</project>

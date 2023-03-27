@@ -1,0 +1,103 @@
+name: jax_eo_py310
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python=3.10
+# Standard Libraries
+- numpy             # Numerical Linear Algebra
+- scipy             # Scientific Computing
+- conda-forge::xarray            # Data structures
+- pandas            # Data structure
+- scikit-learn      # Machine Learning
+- scikit-image      # Image Processing
+- conda-forge::statsmodels       # Statistical Learning
+- conda-forge::pyinterp
+- conda-forge::xbatcher
+# PLOTTING LIBRARY
+- matplotlib                      # standard plotting library
+- seaborn                         # Stats viz library
+- pyviz::geoviews                 # holoviews for geo data
+- conda-forge::cartopy            # EO plotting
+- pyviz::hvplot                   # interactive plots
+- pyviz::datashader                      # scale plots
+- conda-forge::xmovie             # xarray movies/gifs
+- conda-forge::xbatcher
+# Storage
+- anaconda::netCDF4
+- conda-forge::zarr
+# JAX FRAMEWORK
+- conda-forge::jax
+- conda-forge::jaxlib
+# GUI
+- conda-forge::ipywidgets
+- ipykernel
+- conda-forge::tqdm
+# TENSORFLOW ECOSYSTEM
+#- apple::tensorflow-deps
+# PYTORCH ECOSYSTEM
+- pytorch::pytorch           # tensor library
+- pytorch::torchvision       # pytorch visual library
+- pytorch::torchaudio       # pytorch audio library
+# GUI
+- conda-forge::ipywidgets
+- ipykernel
+- conda-forge::tqdm
+- pip
+- pip:
+  # PyTorch Framework
+  - torchtyping
+  - torchgeo
+  - pytorch-lightning
+  # TensorFlow Framework
+  - tensorflow-macos
+  - tensorflow-metal
+  # Jax framework
+  - jax[cpu]
+  - einops
+  - jaxtyping
+  - dm-pix
+  # deep learning
+  - serket
+  - pytreeclass
+  - kernex
+  - equinox
+  - diffrax
+  - flax
+  - ciclo
+  # optimization
+  - optax
+  - jaxopt
+  # probabilistic
+  - tinygp
+  - distrax
+  - blackjax
+  - numpyro
+  - tensorflow_probability
+  - bayesnewton
+  # OTHER
+  - plum-dispatch
+  # formatting
+  - black
+  - pylint
+  - isort
+  - flake8
+  - mypy
+  - pytest
+  - pre-commit
+  - rich
+  - sh
+  - pudb
+  # Notebook stuff
+  - pyprojroot
+  - python-dotenv
+  # logging
+  - wandb
+  - loguru
+  # plotting
+  - celluloid
+  - corner
+  # experiment
+  - hydra-core
+  - hydra-colorlog
+  - hydra-optuna-sweeper

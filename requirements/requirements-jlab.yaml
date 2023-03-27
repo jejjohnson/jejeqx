@@ -1,0 +1,19 @@
+name: eqx_trainer
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  # GUI
+  - tqdm # For status bars
+  - pip # To install other packages
+  - pip:
+      - beartype
+      - einops
+      - jax
+      - jaxlib
+      - optax
+      - equinox
+      - jaxtyping
+      - pytorch
+      - torchvision
+      - pytorch-lightning

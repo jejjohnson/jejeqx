@@ -1,0 +1,29 @@
+name: eqx_trainer
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  # GUI
+  - conda-forge::jupyterlab
+  - conda-forge::nb_conda_kernels==2.3.1 # Access to other conda kernels
+  - conda-forge::spyder-kernels # Access via spyder kernels
+  - conda-forge::nodejs # for extensions in jupyterlab
+  - conda-forge::jupyterlab-git
+  - conda-forge::jupyter-server-proxy
+  - conda-forge::ipywidgets
+  - conda-forge::jupyterlab-snippets
+  - conda-forge::jupyterlab_code_formatter
+  - conda-forge::jupyter-resource-usage
+  - conda-forge::jupytext
+  - conda-forge::gh # github git system
+  - anaconda::git # most updated version for git
+  - pyviz::holoviews
+  - bokeh::bokeh
+  - bokeh::jupyter_bokeh # Bokeh
+  - tqdm # For status bars
+  - pip # To install other packages
+  - pip:
+      - dask_labextension
+      - nbdime
+      - black
+      - isort

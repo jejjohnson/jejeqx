@@ -133,3 +133,15 @@ datasets/*
 *.pckl
 *.pkl
 *.pickle
+
+# Default virtual env location created by poetry
+.venv/
+\_build/
+\.vscode/
+\.ipynb_checkpoints/
+*.ckpt
+*.nc
+\private/
+.DS_Store
+\wandb/
+\lightning_logs/
