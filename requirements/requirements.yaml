@@ -1,4 +1,4 @@
-name: eqx_trainer
+name: jejeqx
 channels:
   - conda-forge
 dependencies:

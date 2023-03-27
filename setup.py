@@ -38,7 +38,7 @@ setup(
     name="eqx-trainer",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    packages=find_namespace_packages(include=["eqx_trainer"]),
+    packages=find_namespace_packages(include=["jejeqx"]),
     author="J. Emmanuel Johnson",
     author_email="jemanjohnson34@gmail.com",
     license="LICENSE",
