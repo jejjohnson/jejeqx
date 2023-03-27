@@ -34,6 +34,11 @@ pip install -e .[dev,all]
 pip install "git+https://github.com/jejjohnson/jemanjjax.git"
 ```
 
+---
+## Algorithms
+
+**Neural Fields** (NerFs)
+
 
 
 ---
