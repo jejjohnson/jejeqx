@@ -11,10 +11,15 @@ from jejeqx._src.dataloaders import NumpyLoader
 from sklearn.model_selection import train_test_split
 
 
-FILE_NATL60_GULFSTREAM = "https://s3.us-east-1.wasabisys.com/melody/osse_data/ref/NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc"
-
-
-
+FILE_GULFSTREAM_SSH_NATL60 = "https://s3.us-east-1.wasabisys.com/melody/osse_data/ref/NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc"
+FILE_GULFSTREAM_SSH_SWOT = "https://s3.us-east-1.wasabisys.com/melody/osse_data/data/gridded_data_swot_wocorr/dataset_nadir_0d_swot.nc"
+FILE_GULFSTREAM_SSH_DUACS = "https://s3.us-east-1.wasabisys.com/melody/osse_data/oi/ssh_NATL60_swot_4nadir.nc"
+FILE_GULFSTREAM_SST_NATL60 = "https://s3.us-east-1.wasabisys.com/melody/osse_data/ref/NATL60-CJM165_GULFSTREAM_sst_y2013.1y.nc"
+FILE_GULFSTREAM_SSS_NATL60 = "https://s3.us-east-1.wasabisys.com/melody/osse_data/ref/NATL60-CJM165_GULFSTREAM_sss_y2013.1y.nc"
+FILE_GULFSTREAM_SSH_NADIR = "https://s3.us-east-1.wasabisys.com/melody/osse_data/data/gridded_data_swot_wocorr/dataset_nadir_0d.nc"
+FILE_GULFSTREAM_SSH_OI_NADIR = "https://s3.us-east-1.wasabisys.com/melody/osse_data/oi/ssh_NATL60_4nadir.nc"
+FILE_GULFSTREAM_SSH_SWOT = "https://s3.us-east-1.wasabisys.com/melody/osse_data/data/gridded_data_swot_wocorr/dataset_swot.nc"
+FILE_GULFSTREAM_SSH_OI_SWOT = "https://s3.us-east-1.wasabisys.com/melody/osse_data/oi/ssh_NATL60_swot.nc"
 
 class XRDataModule(pl.LightningDataModule):
     
