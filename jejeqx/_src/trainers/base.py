@@ -2,6 +2,7 @@ import time
 from typing import Dict, Any, Optional, Iterator, List, Tuple
 from jaxtyping import Array, PyTree
 import jax
+import numpy as np
 import optax
 import equinox as eqx
 from tqdm import tqdm
@@ -68,14 +69,16 @@ class TrainerModule:
     
 
     def create_jitted_functions(self):
-        train_step, eval_step = self.create_functions()
+        train_step, eval_step, predict_step = self.create_functions()
         if self.debug:
             self.train_step = train_step
             self.eval_step = eval_step
+            self.predict_step = predict_step
 
         else:
             self.train_step = eqx.filter_jit(train_step)
             self.eval_step = eqx.filter_jit(eval_step)
+            self.predict_step = eqx.filter_jit(predict_step)
 
     def create_functions(self):
         def train_step(state: TrainState, batch: Any):
@@ -136,6 +139,32 @@ class TrainerModule:
             (log_prefix + key): (metrics[key] / num_elements).item() for key in metrics
         }
         return metrics
+    
+    def predict_model(self, dataloader, log_prefix=""):
+        metrics = defaultdict(float)
+        
+        model = self.state.params
+        num_elements = 0
+        out = list()
+        for batch in dataloader:
+            pred, step_metrics = self.predict_step(model, batch)
+            batch_size = (
+                batch[0].shape[0]
+                if isinstance(batch, (list, tuple))
+                else batch.shape[0]
+            )
+            for key in step_metrics:
+                metrics[key] += step_metrics[key] * batch_size
+                
+            num_elements += batch_size
+            out.append(pred)
+            
+        metrics = {
+            (log_prefix + key): (metrics[key] / num_elements).item() for key in metrics
+        }
+        out = np.vstack(out)
+        return out, metrics
+        
 
     def train_model(self, dm, num_epochs: int = 500):
         dm.setup()
