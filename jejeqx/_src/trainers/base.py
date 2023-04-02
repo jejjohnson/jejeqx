@@ -126,11 +126,14 @@ class TrainerModule:
         num_elements = 0
         for batch in dataloader:
             step_metrics = self.eval_step(model, batch)
-            batch_size = (
-                batch[0].shape[0]
-                if isinstance(batch, (list, tuple))
-                else batch.shape[0]
-            )
+            
+            if isinstance(batch, (list, tuple)):
+                batch_size = batch[0].shape[0]
+            elif isinstance(batch, dict):
+                batch_size = list(batch.values())[0].shape[0]
+            else:
+                batch_size = batch.shape[0]
+            
             for key in step_metrics:
                 metrics[key] += step_metrics[key] * batch_size
 
@@ -148,11 +151,14 @@ class TrainerModule:
         out = list()
         for batch in dataloader:
             pred, step_metrics = self.predict_step(model, batch)
-            batch_size = (
-                batch[0].shape[0]
-                if isinstance(batch, (list, tuple))
-                else batch.shape[0]
-            )
+            
+            if isinstance(batch, (list, tuple)):
+                batch_size = batch[0].shape[0]
+            elif isinstance(batch, dict):
+                batch_size = list(batch.values())[0].shape[0]
+            else:
+                batch_size = batch.shape[0]
+            
             for key in step_metrics:
                 metrics[key] += step_metrics[key] * batch_size
                 
