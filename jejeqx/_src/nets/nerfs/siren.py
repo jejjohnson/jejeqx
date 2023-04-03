@@ -10,7 +10,7 @@ import jax.random as jrandom
 
 import equinox as eqx
 from equinox import static_field
-from equinox.nn.linear import Identity
+from equinox.nn import Identity
 from jejeqx._src.nets.activations import ReLU
 
 PRNGKey = jax.random.PRNGKey
