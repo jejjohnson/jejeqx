@@ -42,6 +42,7 @@ dependencies:
   # GUI
   - conda-forge::ipywidgets
   - ipykernel
+  - conda-forge::ipympl
   - conda-forge::tqdm
   - pip
   - pip:

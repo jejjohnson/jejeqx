@@ -1,6 +1,7 @@
 import numpy as np
 from einops import rearrange
 
+
 def get_image_coordinates(image, min_val: int=-1, max_val: int=1):
     # get image size
     image_height, image_width, _ = image.shape

@@ -21,6 +21,7 @@ FILE_GULFSTREAM_SSH_OI_NADIR = "https://s3.us-east-1.wasabisys.com/melody/osse_d
 FILE_GULFSTREAM_SSH_SWOT = "https://s3.us-east-1.wasabisys.com/melody/osse_data/data/gridded_data_swot_wocorr/dataset_swot.nc"
 FILE_GULFSTREAM_SSH_OI_SWOT = "https://s3.us-east-1.wasabisys.com/melody/osse_data/oi/ssh_NATL60_swot.nc"
 
+
 class XRDataModule(pl.LightningDataModule):
     
     def __init__(
@@ -92,15 +93,16 @@ class XRDataModule(pl.LightningDataModule):
         
         ds = self.load_xrdata()
         
-
-            
         # convert xarray to daraframe
         ds = ds.to_dataframe()
+        
+        ds = ds.dropna()
+        
         self.coord_index = ds.index
         
         ds = ds.reset_index()
         
-        ds = ds.dropna()
+        
         
         
         if self.transforms is not None:
@@ -154,7 +156,7 @@ class XRDataModule(pl.LightningDataModule):
     
 
     
-class XRSTDataModule(pl.LightningDataModule):
+class XRSTDataModule(XRDataModule):
     
     def __init__(
         self, 
@@ -207,33 +209,20 @@ class XRSTDataModule(pl.LightningDataModule):
         else:
             raise ValueError(f"file doesnt exist: {self.file_name}")
             
-    
-    def _load_data(self, path):
-        
-        ds = xr.open_dataset(
-                path, decode_times=False
-            ).assign_coords(time=lambda ds: pd.to_datetime(ds.time))
-        if self.select is not None:
-            ds = ds.sel(**self.select)
-        if self.iselect is not None:
-            ds = ds.isel(**self.iselect)
-        if self.coarsen is not None:
-            ds = ds.coarsen(dim=self.coarsen, boundary="trim").mean()
-        return ds.compute()
-        
     def setup(self, stage=None):
         # load
         
-        ds = self.load_xrdata()
-        
+        ds = self.load_xrdata()        
 
             
         # convert xarray to daraframe
         ds = ds.to_dataframe()
+        
+        ds = ds.dropna()
+        
         self.coord_index = ds.index
         
         ds = ds.reset_index()
-        
         
         if self.transforms is not None:
             ds = self.transforms.fit_transform(ds)
@@ -271,21 +260,6 @@ class XRSTDataModule(pl.LightningDataModule):
             
         return xtrain, xvalid, ttrain, tvalid, ytrain, yvalid
     
-    def data_to_df(self, x):
-        return pd.DataFrame(x, index=self.coord_index, columns=self.variables)
-    
-    def train_dataloader(self):
-        return NumpyLoader(self.ds_train, batch_size=self.batch_size, shuffle=self.shuffle)
-
-    def val_dataloader(self):
-        return NumpyLoader(self.ds_valid, batch_size=self.batch_size)
-
-    def test_dataloader(self):
-        return NumpyLoader(self.ds_test, batch_size=self.batch_size)
-
-    def predict_dataloader(self):
-        return NumpyLoader(self.ds_test, batch_size=self.batch_size)
-    
     
     
 class SSHNATL60(XRDataModule):
@@ -295,3 +269,17 @@ class SSHNATL60(XRDataModule):
 class SSHSTNATL60(XRSTDataModule):
     file_name = "NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc"
     
+class SSHSTSWOT(XRSTDataModule):
+    file_name = "dataset_nadir_0d_swot.nc"
+    
+    def _load_data(self, path):
+        
+        ds = xr.open_dataset(path)
+        if self.select is not None:
+            ds = ds.sel(**self.select)
+        if self.iselect is not None:
+            ds = ds.isel(**self.iselect)
+        if self.coarsen is not None:
+            ds = ds.coarsen(dim=self.coarsen, boundary="trim").mean()
+            
+        return ds.compute()
