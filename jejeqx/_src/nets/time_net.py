@@ -10,10 +10,10 @@ from jaxtyping import Array
 
 class TimeIdentity(eqx.Module):
     out_features: int = static_field()
-    def __init__(self, out_features: int):
+    def __init__(self, out_features: int, *, key: jrandom.PRNGKey):
         self.out_features = out_features
         
-    def __call__(self, t: Array) -> Array:
+    def __call__(self, t: Array, *, key=None) -> Array:
         
         return repeat(t, "() -> D", D=self.out_features)
     
@@ -36,7 +36,7 @@ class TimeTanh(eqx.Module):
         )
         
     
-    def __call__(self, t: Array) -> Array:
+    def __call__(self, t: Array, *, key=None) -> Array:
         return jax.nn.tanh(self.scale(t))
     
     
@@ -58,7 +58,7 @@ class TimeLog(eqx.Module):
         )
         
     
-    def __call__(self, t: Array) -> Array:
+    def __call__(self, t: Array, *, key=None) -> Array:
         return jnp.log(jnp.exp(self.scale(t)) + 1)
     
 
@@ -99,7 +99,7 @@ class TimeFourier(eqx.Module):
             return self.weight / self.out_features
         
     
-    def __call__(self, t: Array) -> Array:
+    def __call__(self, t: Array, *, key=None) -> Array:
         
         scale = self.get_scale()
         
