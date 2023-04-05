@@ -104,7 +104,6 @@ class XRDataModule(pl.LightningDataModule):
         
         
         def preprocess(ds):
-            
             if self.select is not None:
                 ds = ds.sel(**self.select)
             if self.iselect is not None:
