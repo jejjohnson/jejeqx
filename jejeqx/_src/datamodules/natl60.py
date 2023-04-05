@@ -34,6 +34,7 @@ class XRDataModule(pl.LightningDataModule):
         select: Dict=None,
         iselect: Dict=None,
         coarsen: Dict=None,
+        resample: Dict=None,
         coords: List=["lat", "lon"],
         variables: List=["ssh"],
         train_size: float=0.80,
@@ -49,6 +50,7 @@ class XRDataModule(pl.LightningDataModule):
         self.select = select
         self.iselect = iselect
         self.coarsen = coarsen
+        self.resample = resample
         self.coords = coords
         self.variables = variables
         self.transforms = transforms
@@ -56,11 +58,35 @@ class XRDataModule(pl.LightningDataModule):
         self.random_state = random_state
         
     def load_xrdata(self):
+        if isinstance(self.file_name, str):
+            path = Path(self.directory).joinpath(self.file_name)
         
-        path = Path(self.directory).joinpath(self.file_name)
-        
-        if path.is_file():
-            return self._load_data(path)
+            if path.is_file():
+                return self._load_data(path)
+            else:
+                raise ValueError(f"file doesnt exist: {path}")
+        elif isinstance(self.file_name, list):
+            
+            datasets = list()
+            for ifile in self.file_name:
+                path = Path(self.directory).joinpath(ifile)
+                
+                
+                if path.is_file():
+                    ids = self._load_data(path)
+                    print(ids)
+                    datasets.append(ids)
+                else:
+                    raise ValueError(f"file doesnt exist: {path}")
+            
+            # dims = list(datasets[0].coords.keys())
+            datasets = xr.merge(datasets, join="inner")
+            
+            datasets = datasets.transpose("time", "lat", "lon")
+            print(datasets)
+            
+            return datasets
+                
 #         elif not path.is_file() and self.download:
 #             cmd = f"wget -nc "
 #             cmd += f"--directory-prefix={self.directory} "
@@ -71,14 +97,30 @@ class XRDataModule(pl.LightningDataModule):
 #             return self._load_data(path)
         
         else:
-            raise ValueError(f"file doesnt exist: {self.file_name}")
+            raise ValueError(f"Unrecognized type...")
             
     
-    def _load_data(self, path):
+    def _load_data(self, path, decode: bool=False):
         
+        
+        def preprocess(ds):
+            
+            if self.select is not None:
+                ds = ds.sel(**self.select)
+            if self.iselect is not None:
+                ds = ds.isel(**self.iselect)
+            if self.coarsen is not None:
+                ds = ds.coarsen(dim=self.coarsen, boundary="trim").mean()
+            if self.resample is not None:
+                ds = ds.resample(time=self.resample).mean()
+            return ds
+                
+        
+
         ds = xr.open_dataset(
                 path, decode_times=False
             ).assign_coords(time=lambda ds: pd.to_datetime(ds.time))
+        
         if self.select is not None:
             ds = ds.sel(**self.select)
         if self.iselect is not None:
@@ -191,23 +233,6 @@ class XRSTDataModule(XRDataModule):
         self.train_size = train_size
         self.random_state = random_state
         
-    def load_xrdata(self):
-        
-        path = Path(self.directory).joinpath(self.file_name)
-        
-        if path.is_file():
-            return self._load_data(path)
-#         elif not path.is_file() and self.download:
-#             cmd = f"wget -nc "
-#             cmd += f"--directory-prefix={self.directory} "
-#             cmd += f"{FILE_NATL60_GULFSTREAM}"
-            
-#             runcmd(cmd, verbose=True)
-            
-#             return self._load_data(path)
-        
-        else:
-            raise ValueError(f"file doesnt exist: {self.file_name}")
             
     def setup(self, stage=None):
         # load
@@ -268,6 +293,12 @@ class SSHNATL60(XRDataModule):
     
 class SSHSTNATL60(XRSTDataModule):
     file_name = "NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc"
+    
+class SSHSSTSTNATL60(XRSTDataModule):
+    file_name = [
+        "NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc",
+        "NATL60-CJM165_GULFSTREAM_sst_y2013.1y.nc",
+    ]
     
 class SSHSTSWOT(XRSTDataModule):
     file_name = "dataset_nadir_0d_swot.nc"

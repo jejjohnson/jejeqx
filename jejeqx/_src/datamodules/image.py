@@ -18,7 +18,8 @@ class ImageDM(pl.LightningDataModule):
         random_state: int=123,
         shuffle: bool=False, 
         split_method: str="even",
-        resize: int=1
+        resize: int=1,
+        image_url: str=None
     ):
         super().__init__()
         self.batch_size = batch_size
@@ -27,6 +28,7 @@ class ImageDM(pl.LightningDataModule):
         self.train_size = train_size
         self.random_state = random_state
         self.resize = resize
+        self.image_url = image_url
         
     def _load_image(self):
         raise NotImplementedError()
@@ -102,9 +104,9 @@ class ImageDM(pl.LightningDataModule):
 class ImageFox(ImageDM):
 
     def _load_image(self):
-        return load_fox()
+        return load_fox(self.image_url)
 
 class ImageCameraman(ImageDM):
 
     def _load_image(self):
-        return load_cameraman()
+        return load_cameraman(self.image_url)

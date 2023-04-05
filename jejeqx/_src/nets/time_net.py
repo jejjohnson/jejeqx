@@ -10,7 +10,7 @@ from jaxtyping import Array
 
 class TimeIdentity(eqx.Module):
     out_features: int = static_field()
-    def __init__(self, out_features: int):
+    def __init__(self, out_features: int, *, key: jrandom.PRNGKey):
         self.out_features = out_features
         
     def __call__(self, t: Array, *, key=None) -> Array:
