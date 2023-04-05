@@ -13,7 +13,7 @@ class TimeIdentity(eqx.Module):
     def __init__(self, out_features: int):
         self.out_features = out_features
         
-    def __call__(self, t: Array) -> Array:
+    def __call__(self, t: Array, *, key=None) -> Array:
         
         return repeat(t, "() -> D", D=self.out_features)
     
@@ -36,7 +36,7 @@ class TimeTanh(eqx.Module):
         )
         
     
-    def __call__(self, t: Array) -> Array:
+    def __call__(self, t: Array, *, key=None) -> Array:
         return jax.nn.tanh(self.scale(t))
     
     
@@ -58,7 +58,7 @@ class TimeLog(eqx.Module):
         )
         
     
-    def __call__(self, t: Array) -> Array:
+    def __call__(self, t: Array, *, key=None) -> Array:
         return jnp.log(jnp.exp(self.scale(t)) + 1)
     
 
@@ -99,11 +99,17 @@ class TimeFourier(eqx.Module):
             return self.weight / self.out_features
         
     
-    def __call__(self, t: Array) -> Array:
+    def __call__(self, t: Array, *, key=None) -> Array:
         
         scale = self.get_scale()
         
         t = scale * jnp.sin(self.shift * t)
         
-        
         return t.squeeze()
+    
+    
+class TimeFourierBounded(TimeFourier):
+    def __init__(self, in_features: int, out_features: int, lmbda: float=0.5, *, key: jrandom.PRNGKey):
+        super().__init__(
+            in_features=in_features, out_features=out_features,
+            lmbda=lmbda, bounded=True, key=key)
