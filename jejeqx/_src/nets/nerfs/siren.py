@@ -264,6 +264,9 @@ class SirenNet(eqx.Module):
         **kwargs,
     ):
         """
+        /gpfswork/rech/yrf/commun/data_challenges/dc21a_ose/test
+        w1OgWd
+        johnsonj@univ-grenoble-alpes.fr
         Args:
             in_size (int): The input size. The input to the module should be a vector of
                 shape (in_features,)

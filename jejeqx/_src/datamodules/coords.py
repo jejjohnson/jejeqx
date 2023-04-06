@@ -48,7 +48,10 @@ class AlongTrackDM(pl.LightningDataModule):
         self.shuffle = shuffle
         
         
-    def load_xrds(self, paths, **kwargs):
+    def load_xrds(self, paths=None, **kwargs):
+        
+        if paths is None:
+            paths = self.paths
         
         def preprocess(ds):
             ds = ds.sortby("time")
@@ -119,11 +122,12 @@ class AlongTrackDM(pl.LightningDataModule):
         
         # do specific spatial-temporal-variable transformations
         if self.spatial_transform is not None:
-           x = self.spatial_transform.fit_transform(x)
+            x = self.spatial_transform.fit_transform(x)
         if self.temporal_transform is not None:
-           t = self.temporal_transform.fit_transform(t)
+            t = self.temporal_transform.fit_transform(t)
         if self.variable_transform is not None:
-           y = self.variable_transform.fit_transform(y)
+            y = self.variable_transform.fit_transform(y)
+            
         
         # extract the values
         x, t, y = x.values, t.values, y.values
