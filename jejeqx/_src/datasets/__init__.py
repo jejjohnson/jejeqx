@@ -16,7 +16,7 @@ class RegressionDataset(data.Dataset):
     
 
 class SpatioTempDataset(data.Dataset):
-    def __init__(self, space_coords, time_coords, data):
+    def __init__(self, space_coords, time_coords, data=None):
         super().__init__()
         self.space_coords = space_coords
         self.time_coords = time_coords
@@ -30,7 +30,8 @@ class SpatioTempDataset(data.Dataset):
         
         outputs["spatial"] = self.space_coords[idx]
         outputs["temporal"] = self.time_coords[idx]
-        outputs["data"] = self.data[idx]
+        if self.data is not None:
+            outputs["data"] = self.data[idx]
         
         return outputs
     

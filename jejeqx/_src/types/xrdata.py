@@ -1,6 +1,6 @@
 from typing import Literal
 from dataclasses import dataclass
-from xarray_dataclasses import Coordof, Attr, Coord, Data, Name, AsDataArray, AsDataset, Dataof
+from xarray_dataclasses import Coordof, Dataof, Attr, Coord, Data, Name, AsDataArray, AsDataset, Dataof
 import numpy as np
 import pandas as pd
 
@@ -18,6 +18,7 @@ TIME = Literal["time"]
 class Bounds:
     val_min: float
     val_max: float
+    val_step: float
     name: str = ""
 
 
@@ -32,15 +33,23 @@ class Region:
 
 @dataclass
 class Period:
-    t_min: float
-    t_max: float
+    t_min: str
+    t_max: str
+    dt_freq: int
+    dt_unit: str
     name: str = ""
-
-    @classmethod
-    def init_from_str(cls, t_min: str, t_max: str, **kwargs):
-        t_min = pd.to_datetime(t_min)
-        t_max = pd.to_datetime(t_max)
-        return cls(t_min=t_min, t_max=t_max, **kwargs)
+    
+    @property
+    def t_min_dt(self):
+        return pd.to_datetime(self.t_min)
+    
+    @property
+    def t_max_dt(self):
+        return pd.to_datetime(self.t_max)
+    
+    @property
+    def dt(self):
+        return pd.to_timedelta(self.dt_freq, self.dt_unit)
 
 
 @dataclass
@@ -136,18 +145,23 @@ class Grid2D(AsDataArray):
         return (self.lat.ndim, self.lon.ndim)
     
     @property
-    def grid(self):
+    def spatial_grid(self):
         grid = np.meshgrid(self.lat.data, self.lon.data, indexing="ij")
         return np.stack(grid, axis=-1)
     
 
 @dataclass
-class Grid2DT(Grid2D):
+class Grid2DT(AsDataArray):
+    data: Data[tuple[TIME, LAT, LON], np.float32]
     time: Coordof[TimeAxis] = 0
+    lat: Coordof[LatitudeAxis] = 0
+    lon: Coordof[LongitudeAxis] = 0
+    name: Name[str] = "var"
 
     @property
     def ndim(self):
         return (self.time.ndim, self.lat.ndim, self.lon.ndim)
+        
 
 
 @dataclass

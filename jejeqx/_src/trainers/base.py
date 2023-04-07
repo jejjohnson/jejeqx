@@ -69,15 +69,17 @@ class TrainerModule:
     
 
     def create_jitted_functions(self):
-        train_step, eval_step, predict_step = self.create_functions()
+        train_step, eval_step, test_step, predict_step = self.create_functions()
         if self.debug:
             self.train_step = train_step
             self.eval_step = eval_step
             self.predict_step = predict_step
+            self.test_step = test_step
 
         else:
             self.train_step = eqx.filter_jit(train_step)
             self.eval_step = eqx.filter_jit(eval_step)
+            self.test_step = eqx.filter_jit(test_step)
             self.predict_step = eqx.filter_jit(predict_step)
 
     def create_functions(self):
@@ -143,14 +145,14 @@ class TrainerModule:
         }
         return metrics
     
-    def predict_model(self, dataloader, log_prefix=""):
+    def test_model(self, dataloader, log_prefix=""):
         metrics = defaultdict(float)
         
         model = self.state.params
         num_elements = 0
         out = list()
-        for batch in self.tracker(dataloader, desc="Prediction", leave=False):
-            pred, step_metrics = self.predict_step(model, batch)
+        for batch in self.tracker(dataloader, desc="Testing", leave=False):
+            pred, step_metrics = self.test_step(model, batch)
             
             if isinstance(batch, (list, tuple)):
                 batch_size = batch[0].shape[0]
@@ -171,6 +173,19 @@ class TrainerModule:
         out = np.vstack(out)
         return out, metrics
         
+    def predict_model(self, dataloader, log_prefix=""):
+        metrics = defaultdict(float)
+        
+        model = self.state.params
+        num_elements = 0
+        out = list()
+        for batch in self.tracker(dataloader, desc="Prediction", leave=False):
+            pred = self.predict_step(model, batch)
+            
+            out.append(pred)
+
+        out = np.vstack(out)
+        return out
 
     def train_model(self, dm, num_epochs: int = 500):
         self.on_training_start()

@@ -2,13 +2,16 @@ from typing import List, Dict, Optional, Callable
 import warnings
 import xarray as xr
 import pandas as pd
+import numpy as np
 import pytorch_lightning as pl
 from jejeqx._src.datasets import SpatioTempDataset
 from jejeqx._src.dataloaders import NumpyLoader
 from jejeqx._src.transforms.spatial import validate_lon, validate_lat
 from jejeqx._src.transforms.temporal import decode_cf_time, validate_time
+from jejeqx._src.types.xrdata import Bounds, Period, TimeAxis, LongitudeAxis, LatitudeAxis, Grid2DT
 from sklearn.model_selection import train_test_split
 from dask.array.core import PerformanceWarning
+from xarray_dataclasses import asdataset
 
 
 class AlongTrackDM(pl.LightningDataModule):
@@ -31,6 +34,7 @@ class AlongTrackDM(pl.LightningDataModule):
                  subset_size: Optional[int]=None,
                  subset_seed: int=42,
                  time_units: str='seconds since 2012-10-01',
+                 evaluation: bool = False
                 ):
         super().__init__()
 
@@ -52,6 +56,7 @@ class AlongTrackDM(pl.LightningDataModule):
         self.variable_transform = variable_transform
         self.shuffle = shuffle
         self.time_units = time_units
+        self.evaluation = evaluation
         
         
         
@@ -134,11 +139,21 @@ class AlongTrackDM(pl.LightningDataModule):
         
         # do specific spatial-temporal-variable transformations
         if self.spatial_transform is not None:
-            x = self.spatial_transform.fit_transform(x)
+            if not self.evaluation:
+                x = self.spatial_transform.fit_transform(x)
+            else:
+                x = self.spatial_transform.transform(x)
+                
         if self.temporal_transform is not None:
-            t = self.temporal_transform.fit_transform(t)
+            if not self.evaluation:
+                t = self.temporal_transform.fit_transform(t)
+            else:
+                t  = self.temporal_transform.transform(t)
         if self.variable_transform is not None:
-            y = self.variable_transform.fit_transform(y)
+            if not self.evaluation:
+                y = self.variable_transform.fit_transform(y)
+            else:
+                y = self.variable_transform.transform(y)
             
         
         # extract the values
@@ -204,6 +219,7 @@ class AlongTrackDM(pl.LightningDataModule):
         return NumpyLoader(self.ds_test, batch_size=self.batch_size)
         
         
+        
 class EvalCoordDM(AlongTrackDM):
     
     
@@ -230,55 +246,63 @@ class EvalCoordDM(AlongTrackDM):
     
 class EvalGridDM(pl.LightningDataModule):
     def __init__(self,
+                 lon_limits: Bounds,
+                 lat_limits: Bounds,
+                 time_limits: Period,
                  spatial_coords: List[str]=["lat", "lon"],
                  temporal_coords: List[str]=["time"],
-                 variables: List[str]=["ssh"],
                  batch_size: int=128,
-                 select: Dict=None,
-                 iselect: Dict=None,
-                 coarsen: Dict=None,
-                 resample: Dict=None,
                  spatial_transform: Callable=None,
                  temporal_transform: Callable=None,
                  variable_transform: Callable=None,
-                 shuffle: bool=True,
-                 split_seed: int=123,
-                 train_size: float=0.8,
-                 subset_size: Optional[int]=None,
-                 subset_seed: int=42,
                  time_units: str='seconds since 2012-10-01',
                 ):
         super().__init__()
 
-        self.paths = paths
+        self.lon_limits = lon_limits
+        self.lat_limits = lat_limits
+        self.time_limits = time_limits
         self.spatial_coords = spatial_coords
         self.temporal_coords = temporal_coords
-        self.variables = variables
         self.batch_size = batch_size
-        self.select = select
-        self.iselect = iselect
-        self.coarsen = coarsen
-        self.resample = resample
-        self.split_seed = split_seed
-        self.train_size = train_size
-        self.subset_size = subset_size
-        self.subset_seed = subset_seed
         self.spatial_transform = spatial_transform
         self.temporal_transform = temporal_transform
         self.variable_transform = variable_transform
-        self.shuffle = shuffle
         self.time_units = time_units
         
         
     def preprocess(self):
         
-         x, y, z = np.meshgrid(
-            ds.coords["time"].data,
-            ds.coords["latitude"].data,
-            ds.coords["longitude"].data,
+        # create spatialtemporal grid
+        time_axis = TimeAxis.init_from_limits(
+            t_min=pd.to_datetime(self.time_limits.t_min), 
+            t_max=pd.to_datetime(self.time_limits.t_max), 
+            dt=pd.to_timedelta(
+                self.time_limits.dt_freq,
+                self.time_limits.dt_unit
+            )
         )
-
-        ds = self.load_xrds(paths=self.paths)
+        lon_axis = LongitudeAxis.init_from_limits(
+            lon_min=self.lon_limits.val_min, 
+            lon_max=self.lon_limits.val_max, 
+            dlon=self.lon_limits.val_step
+        )
+        lat_axis = LatitudeAxis.init_from_limits(
+            lat_min=self.lat_limits.val_min, 
+            lat_max=self.lat_limits.val_max, 
+            dlat=self.lat_limits.val_step
+        )
+        
+        data = np.empty((time_axis.ndim, lat_axis.ndim, lon_axis.ndim))
+        
+        ds = Grid2DT(data=data, time=time_axis, lat=lat_axis, lon=lon_axis, name="empty")
+        
+        ds = asdataset(ds)
+                
+        ds = validate_time(ds)
+        ds = validate_lon(ds)
+        ds = validate_lat(ds)
+        ds = decode_cf_time(ds, units=self.time_units)
         
         # convert xarray to daraframe
         ds = ds.to_dataframe()
@@ -303,52 +327,46 @@ class EvalGridDM(pl.LightningDataModule):
         msg += f"\nColumns: {column_names}"
         assert len(set(self.temporal_coords).intersection(column_names)) == len(self.temporal_coords), msg
 
-        msg = f"No requested variables found in dataset:"
-        msg += f"\nVariables: {self.variables}"
-        msg += f"\nColumns: {column_names}"
-        assert len(set(self.variables).intersection(column_names)) == len(self.variables), msg
+
 
         x = ds[self.spatial_coords]
         t = ds[self.temporal_coords]
-        y = ds[self.variables]
         
         # do specific spatial-temporal-variable transformations
         if self.spatial_transform is not None:
-            x = self.spatial_transform.fit_transform(x)
+            x = self.spatial_transform.transform(x)
         if self.temporal_transform is not None:
-            t = self.temporal_transform.fit_transform(t)
-        if self.variable_transform is not None:
-            y = self.variable_transform.fit_transform(y)
+            t = self.temporal_transform.transform(t)
             
         
         # extract the values
-        x, t, y = x.values, t.values, y.values
+        x, t = x.values, t.values
 
         self.spatial_dims = x.shape[-1]
         self.temporal_dims = t.shape[-1]
-        self.variable_dims = y.shape[-1]
         
-        return x, t, y
+        return x, t
     
     def setup(self, stage=None):
         
-                
-       
+        x, t = self.preprocess()
         
-        x, t, y = self.preprocess()
+        self.ds_predict = SpatioTempDataset(x, t)
+        
+        
 
-        self.ds_test = SpatioTempDataset(x, t, y)
-
+    def data_to_df(self, x, names=["ssh"]):
+        return pd.DataFrame(x, index=self.coord_index, columns=names)
+    
     def train_dataloader(self):
         raise NotImplementedError()
 
     def val_dataloader(self):
         raise NotImplementedError()
-    
+
     def test_dataloader(self):
-        return NumpyLoader(self.ds_test, batch_size=self.batch_size)
+        raise NotImplementedError()
 
     def predict_dataloader(self):
-        return NumpyLoader(self.ds_test, batch_size=self.batch_size)
+        return NumpyLoader(self.ds_predict, batch_size=self.batch_size)
         
-    
