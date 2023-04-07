@@ -14,15 +14,18 @@ class Spherical2Cartesian(BaseEstimator, TransformerMixin):
     
     def transform(self, X: pd.DataFrame, y=None) -> pd.DataFrame:
                 
-        lon, lat = X["lon"], X["lat"]
+        lon, lat = X["lon"].values, X["lat"].values
         
         if self.units == "degrees":
             lon = np.deg2rad(lon)
             lat = np.deg2rad(lat)
             
-        X["x"], X["y"], X["z"] = spherical_to_cartesian_3d(
+        x, y, z = spherical_to_cartesian_3d(
             lon=lon, lat=lat, radius=self.radius
         )
+
+        X = np.stack([x,y,z], axis=-1)
+        X = pd.DataFrame(X, columns=["x", "y", "z"])
         
         return X
     
@@ -36,7 +39,11 @@ class Spherical2Cartesian(BaseEstimator, TransformerMixin):
         if self.units == "degrees":
             lon = np.rad2deg(lon)
             lat = np.rad2deg(lat)
-        X["lon"], X["lat"] = lon, lat
+
+        X = np.stack([lat,lon], axis=-1)
+
+        X = pd.DataFrame([lat,lon], columns=["lat", "lon"])
+
         return X
     
     

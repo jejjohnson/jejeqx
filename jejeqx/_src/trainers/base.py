@@ -149,7 +149,7 @@ class TrainerModule:
         model = self.state.params
         num_elements = 0
         out = list()
-        for batch in dataloader:
+        for batch in self.tracker(dataloader, desc="Prediction", leave=False):
             pred, step_metrics = self.predict_step(model, batch)
             
             if isinstance(batch, (list, tuple)):
@@ -173,7 +173,6 @@ class TrainerModule:
         
 
     def train_model(self, dm, num_epochs: int = 500):
-        dm.setup()
         self.on_training_start()
         state = self.state
         best_eval_metrics = None
