@@ -27,6 +27,7 @@ class AlongTrackDM(pl.LightningDataModule):
                  split_seed: int=123,
                  train_size: float=0.8,
                  subset_size: Optional[int]=None,
+                 subset_seed: int=42
                 ):
         super().__init__()
 
@@ -42,10 +43,12 @@ class AlongTrackDM(pl.LightningDataModule):
         self.split_seed = split_seed
         self.train_size = train_size
         self.subset_size = subset_size
+        self.subset_seed = subset_seed
         self.spatial_transform = spatial_transform
         self.temporal_transform = temporal_transform
         self.variable_transform = variable_transform
         self.shuffle = shuffle
+        
         
         
     def load_xrds(self, paths=None, **kwargs):
@@ -142,6 +145,9 @@ class AlongTrackDM(pl.LightningDataModule):
         
         x, t, y = self.preprocess()
         
+        if self.subset_size is not None:
+            x, t, y = self.subset(x, t, y)
+        
         # train/validation/test split
         xtrain, xvalid, ttrain, tvalid, ytrain, yvalid = self.split(x, t, y)
         
@@ -150,6 +156,16 @@ class AlongTrackDM(pl.LightningDataModule):
         self.ds_valid = SpatioTempDataset(xvalid, tvalid, yvalid)
         self.ds_test = SpatioTempDataset(x, t, y)
 
+    def subset(self, x, t, y):
+        
+        x, _, t, _, y, _ = train_test_split(
+            x, t, y, 
+            train_size=self.subset_size, 
+            random_state=self.subset_seed, 
+            shuffle=True
+        )
+        
+        return x, t, y
         
     def split(self, x, t, y):
         
