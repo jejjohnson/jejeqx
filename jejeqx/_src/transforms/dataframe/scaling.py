@@ -17,16 +17,13 @@ class Deg2Rad(BaseEstimator, TransformerMixin):
     
     def transform(self, X, y=None):
         
-        print(X.min(), X.max())
-        
+                
         X_var = X[self.columns].values
                 
         X_var = np.deg2rad(X_var)
         
         X = pd.DataFrame(X_var, columns=self.columns)
-        
-        print(X.min(), X.max())
-        
+                
         return X
     
     def inverse_transform(self, X, y=None):
@@ -38,6 +35,38 @@ class Deg2Rad(BaseEstimator, TransformerMixin):
         X = pd.DataFrame(X_var, columns=self.columns)
         
         return X
+    
+    
+class FixedScaler(BaseEstimator, TransformerMixin):
+    def __init__(self, scale: np.ndarray=1.0, columns: List[str]=None):
+        self.columns = columns
+        self.scale = scale
+        
+    def fit(self, X, y=None):
+        if self.columns is None:
+            self.columns = X.columns
+            
+        return self
+    
+    def transform(self, X, y=None):
+        X_var = X[self.columns].values
+        
+        X_var *= self.scale
+        
+        X = pd.DataFrame(X_var, columns=self.columns)
+                
+        return X
+    
+    def inverse_transform(self, X, y=None):
+        X_var = X[self.columns].values
+        
+        X_var /= self.scale
+        
+        X = pd.DataFrame(X_var, columns=self.columns)
+                
+        return X
+        
+        
 
 
 class MinMaxFixedScaler(BaseEstimator, TransformerMixin):
@@ -57,7 +86,7 @@ class MinMaxFixedScaler(BaseEstimator, TransformerMixin):
         X_var = X[self.columns].values
                 
         X_var = (X_var - self.min_val) / (self.max_val - self.min_val)
-        
+                
         X = pd.DataFrame(X_var, columns=self.columns)
                 
         return X

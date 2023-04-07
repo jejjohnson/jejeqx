@@ -145,6 +145,8 @@ class AlongTrackDM(pl.LightningDataModule):
         
         x, t, y = self.preprocess()
         
+        self.ds_test = SpatioTempDataset(x, t, y)
+        
         if self.subset_size is not None:
             x, t, y = self.subset(x, t, y)
         
@@ -154,7 +156,7 @@ class AlongTrackDM(pl.LightningDataModule):
         # create spatial-temporal datasets
         self.ds_train = SpatioTempDataset(xtrain, ttrain, ytrain)
         self.ds_valid = SpatioTempDataset(xvalid, tvalid, yvalid)
-        self.ds_test = SpatioTempDataset(x, t, y)
+        
 
     def subset(self, x, t, y):
         
@@ -212,6 +214,10 @@ class EvalCoordDM(AlongTrackDM):
 
     def predict_dataloader(self):
         return NumpyLoader(self.ds_test, batch_size=self.batch_size)
+    
+    
+class EvalGridDM(pl.LightningDataModule):
+    pass
         
         
     

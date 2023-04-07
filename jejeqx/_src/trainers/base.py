@@ -173,7 +173,6 @@ class TrainerModule:
         
 
     def train_model(self, dm, num_epochs: int = 500):
-        dm.setup()
         self.on_training_start()
         state = self.state
         best_eval_metrics = None
