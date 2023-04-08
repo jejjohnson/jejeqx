@@ -94,3 +94,35 @@ def plot_psd_isotropic(
     secax.set(xlabel=xlabel)
 
     return fig, ax, secax
+
+
+
+def plot_psd_spacetime_wavenumber(freq_x, freq_y, psd):
+
+    fig, ax = plt.subplots()
+
+    locator = ticker.LogLocator()
+    norm = colors.LogNorm()
+
+    pts = ax.contourf(
+        freq_x, freq_y, psd, norm=norm, locator=locator, cmap="RdYlGn", extend="both"
+    )
+
+    ax.set(
+        yscale="log",
+        xscale="log",
+        xlabel="Wavenumber [cycles/km]",
+        ylabel="Frequency [cycles/days]",
+    )
+    # colorbar
+    fmt = ticker.LogFormatterMathtext(base=10)
+    cbar = fig.colorbar(
+        pts,
+        pad=0.02,
+        format=fmt,
+    )
+    cbar.ax.set_ylabel(r"PSD [m$^{2}$/cycles/m]")
+
+    plt.grid(which="both", linestyle="--", linewidth=1, color="black", alpha=0.2)
+
+    return fig, ax, cbar
