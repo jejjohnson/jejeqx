@@ -34,7 +34,8 @@ class AlongTrackDM(pl.LightningDataModule):
                  subset_size: Optional[int]=None,
                  subset_seed: int=42,
                  time_units: str='seconds since 2012-10-01',
-                 evaluation: bool = False
+                 evaluation: bool = False,
+                 decode_times: bool=True
                 ):
         super().__init__()
 
@@ -57,6 +58,7 @@ class AlongTrackDM(pl.LightningDataModule):
         self.shuffle = shuffle
         self.time_units = time_units
         self.evaluation = evaluation
+        self.decode_times = decode_times
         
         
         
@@ -94,10 +96,11 @@ class AlongTrackDM(pl.LightningDataModule):
                 paths=paths, preprocess=preprocess, 
                 combine="nested",
                 concat_dim="time",
+                decode_times=self.decode_times,
                 **kwargs)
             
             ds = ds.sortby("time")
-
+            
             return ds.compute()
 
     def preprocess(self):

@@ -191,34 +191,37 @@ class TrainerModule:
         self.on_training_start()
         state = self.state
         best_eval_metrics = None
-        with tqdm(range(1, num_epochs + 1), desc="Epochs") as pbar_epoch:
-            for epoch_idx in pbar_epoch:
-                self.on_training_epoch_start(epoch_idx)
+        try:
+            with tqdm(range(1, num_epochs + 1), desc="Epochs") as pbar_epoch:
+                for epoch_idx in pbar_epoch:
+                    self.on_training_epoch_start(epoch_idx)
 
-                state, train_metrics = self.train_epoch(dm.train_dataloader(), state)
+                    state, train_metrics = self.train_epoch(dm.train_dataloader(), state)
 
-                pbar_epoch.set_description(
-                    f"Epochs: {epoch_idx} | Loss: {train_metrics['train/loss']:.3e}"
-                )
-                if self.pl_logger:
-                    self.pl_logger.log_metrics(train_metrics, step=epoch_idx)
-                self.on_training_epoch_end(epoch_idx)
-
-                if epoch_idx % self.check_val_every_n_epochs == 0:
-                    eval_metrics = self.eval_model(
-                        dm.val_dataloader(), state.params, log_prefix="val/"
-                    )
-                    self.on_validation_epoch_end(
-                        epoch_idx, eval_metrics, dm.val_dataloader()
+                    pbar_epoch.set_description(
+                        f"Epochs: {epoch_idx} | Loss: {train_metrics['train/loss']:.3e}"
                     )
                     if self.pl_logger:
-                        self.pl_logger.log_metrics(eval_metrics, step=epoch_idx)
-                        
-                    if self.is_new_model_better(eval_metrics, best_eval_metrics):
-                        best_eval_metrics = eval_metrics
-                        best_eval_metrics.update(train_metrics)
-                        self.save_model()
+                        self.pl_logger.log_metrics(train_metrics, step=epoch_idx)
+                    self.on_training_epoch_end(epoch_idx)
 
+                    if epoch_idx % self.check_val_every_n_epochs == 0:
+                        eval_metrics = self.eval_model(
+                            dm.val_dataloader(), state.params, log_prefix="val/"
+                        )
+                        self.on_validation_epoch_end(
+                            epoch_idx, eval_metrics, dm.val_dataloader()
+                        )
+                        if self.pl_logger:
+                            self.pl_logger.log_metrics(eval_metrics, step=epoch_idx)
+
+                        if self.is_new_model_better(eval_metrics, best_eval_metrics):
+                            best_eval_metrics = eval_metrics
+                            best_eval_metrics.update(train_metrics)
+                            self.save_model()
+        except KeyboardInterrupt():
+            pass
+        
         self.state = state
         self.on_training_end()
         return train_metrics
