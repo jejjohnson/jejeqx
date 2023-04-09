@@ -129,6 +129,7 @@ def plot_psd_spacetime_wavenumber(
 
     locator = ticker.LogLocator()
     norm = colors.LogNorm()
+    
 
     pts = ax.contourf(
         1/(da.freq_lon*space_scale),
