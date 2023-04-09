@@ -199,3 +199,28 @@ def calculate_strain_magnitude(ds, variables=["u", "v"], normalized: bool=True):
         ds = calculate_coriolis_normalized(ds, variable="strain")
     
     return ds
+
+
+def calculate_okubo_weiss(ds, variables=["u", "v"], normalized: bool=True):
+    
+    du_dx, du_dy = metpy.calc.geospatial_gradient(
+        ds[variables[0]], latitude=ds.lat, longitude=ds.lon)
+    dv_dx, dv_dy = metpy.calc.geospatial_gradient(
+        ds[variables[1]], latitude=ds.lat, longitude=ds.lon)
+    
+    strain_shear = dv_dx + du_dy
+    strain_normal = du_dx - dv_dy
+    relative_vorticity = dv_dx - du_dy
+    
+    ow = strain_normal**2 + strain_shear**2 - relative_vorticity**2
+    
+    ds["ow"] = (("time", "lat", "lon"), ow)
+
+    ds["ow"].attrs["long_name"] = "Okubo-Weiss Parameter"
+    ds["ow"].attrs["standard_name"] = "okubo_weiss_parameter"
+    ds["ow"].attrs["units"] = f"{ow.u:~P}"
+    
+    if normalized:
+        ds = calculate_coriolis_normalized(ds, variable="ow")
+    
+    return ds
