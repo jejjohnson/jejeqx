@@ -1,6 +1,6 @@
 _target_: jejeqx._src.datamodules.coords.AlongTrackDM
 paths: "/gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/work_eman/ml_ready/nadir4.nc"
-batch_size: 5000
+batch_size: 10000
 shuffle: True
 train_size: 0.90
 spatial_coords: ["lat", "lon"]
