@@ -1,0 +1,13 @@
+data:
+  _target_: jejeqx._src.datamodules.coords.AlongTrackDM
+  paths: /gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/work_eman/ml_ready/nadir4.nc
+  batch_size: 5000
+  shuffle: true
+  train_size: 0.9
+  spatial_coords:
+  - lat
+  - lon
+  temporal_coords:
+  - time
+  variable:
+  - ssh_obs

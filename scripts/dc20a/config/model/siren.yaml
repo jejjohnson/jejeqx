@@ -1,0 +1,21 @@
+_target_: jejeqx._src.nets.nerfs.base.NerF
+
+basis_net:
+    _target_: jejeqx._src.nets.nerfs.siren.SirenNet
+    in_size: 4
+    out_size: 256
+    width_size: 256
+    depth: 5
+    key:
+        _target_: jax.random.PRNGKey
+        seed: 123
+network:
+    _target_: equinox.nn.Linear
+    in_features: 256
+    out_features: 1
+    use_bias: True
+    key:
+        _target_: jax.random.PRNGKey
+        seed: 42
+
+
