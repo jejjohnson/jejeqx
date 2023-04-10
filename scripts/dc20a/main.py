@@ -3,28 +3,40 @@ import hydra
 from loguru import logger
 import jax
 import jax.numpy as jnp
+from jejeqx._src.trainers.base import TrainerModule
+from jejeqx._src.trainers.callbacks import wandb_model_artifact
+from jejeqx._src.losses import psnr
+import equinox as eqx
+from pathlib import Path
+import wandb
+from omegaconf import OmegaConf
+import train
+import inference
+
 
 @hydra.main(config_path='config', config_name='main', version_base='1.2')
 def main(cfg):
     
-    logger.info("Starting!")
+    if cfg.stage == "train":
+        logger.info(f"Starting training stage...!")
+        train.main(cfg)
+        
+    elif cfg.stage == "train_more":
+        raise NotImplementedError()
+        
+    elif cfg.stage == "inference":
+        logger.info(f"Starting inference stage...!")
+        inference.main(cfg)
+        
+    elif cfg.stage == "metrics":
+        raise NotImplementedError()
+        
+    elif cfg.stage == "viz":
+        raise NotImplementedError()
     
-    logger.info("Initializing datamodule...")
-    dm = hydra.utils.instantiate(cfg.data)
+    else:
+        raise ValueError(f"Unrecognized stage: {cfg.stage}")
     
-    dm.setup()
-    
-    init = dm.ds_train[:32]
-    x_init, t_init, y_init = init["spatial"], init["temporal"], init["data"]
-    print(x_init.shape, t_init.shape)
-    
-    print(cfg.model)
-    
-    model = hydra.utils.instantiate(cfg.model)
-    
-    # check output of models
-    out = jax.vmap(model)(jnp.hstack([x_init,x_init]))
-    assert out.shape == y_init.shape
 
 if __name__ == "__main__":
     main()

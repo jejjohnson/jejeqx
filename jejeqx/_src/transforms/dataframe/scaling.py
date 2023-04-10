@@ -105,9 +105,12 @@ class MinMaxFixedScaler(BaseEstimator, TransformerMixin):
 class MinMaxDF(BaseEstimator, TransformerMixin):
     def __init__(self, columns: List[str]=None, min_val: float=-1, max_val: float=1):
         self.columns = columns
-        self.transformer = MinMaxScaler((min_val, max_val))
+        self.min_val = min_val
+        self.max_val = max_val
         
     def fit(self, X: pd.DataFrame, y=None):
+        
+        self.transformer = MinMaxScaler((self.min_val, self.max_val))
 
         if self.columns is None:
             self.columns = X.columns
@@ -120,11 +123,21 @@ class MinMaxDF(BaseEstimator, TransformerMixin):
     
     def transform(self, X: pd.DataFrame, y=None):
         
+        #print(f"\n\nType: ", type(X), X.columns)
+        
         X_var = X[self.columns].values
+        #X_std = (X - self.min_val) / (self.max_val - self.min_val)
+        #X_var = X_std * (self.min_val
         
         X_var = self.transformer.transform(X_var)
-        
-        X[self.columns] = X_var
+                         
+        #print(f"\n\nSHAPE: {X_var.shape}\n\n")
+        #print(f"\nDF: {X.shape}\n\n")
+        #print(f"\nCOLUMNS: {self.columns}\n\n")
+        #print(f"\nX: {X[self.columns].shape}\n\n")
+        #X[self.columns].data = X_var
+        #print(f"DONE!")
+        X = pd.DataFrame(data=X_var, columns=self.columns)
         
         return X
     
@@ -135,6 +148,7 @@ class MinMaxDF(BaseEstimator, TransformerMixin):
         X_var = self.transformer.inverse_transform(X_var)
         
         X[self.columns] = X_var
+        
         
         return X
         

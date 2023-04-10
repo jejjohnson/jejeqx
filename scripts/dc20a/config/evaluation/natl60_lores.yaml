@@ -1,11 +1,15 @@
 _target_: jejeqx._src.datamodules.coords.AlongTrackDM
-paths: "/gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/work_eman/ml_ready/nadir4.nc"
-batch_size: 5000
+paths: "/gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/test/dc_ref/NATL60-CJM165_GULFSTREAM*"
+batch_size: 10000
 shuffle: True
 train_size: 0.90
 spatial_coords: ["lat", "lon"]
 temporal_coords: ["time"]
-variables: ["ssh_obs"]
-evaluation: False
+variables: ["sossheig"]
+evaluation: True
+coarsen:
+    lon: 4
+    lat: 4
+resample: "1D"
 select: 
     time: {_target_: builtins.slice, _args_: ["2012-10-01", "2012-12-02"]}

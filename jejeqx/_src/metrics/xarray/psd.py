@@ -55,7 +55,7 @@ def psd_spacetime_score(
     return score
 
 def psd_isotropic_resolved_scale(score: xr.DataArray, level: float=0.5) -> xr.DataArray:
-    score.attrs["resolved_scale"] = find_intercept_1D(
+    score.attrs["resolved_scale_space"] = find_intercept_1D(
         x=score.values, y=1./score.freq_r.values, level=level
     )
     
