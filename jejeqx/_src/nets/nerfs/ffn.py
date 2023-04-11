@@ -1,3 +1,4 @@
+from typing import Tuple, Optional
 from jaxtyping import Array
 from einops import repeat, rearrange
 import equinox as eqx
@@ -12,6 +13,7 @@ class RFFARD(eqx.Module):
     in_dim: int = eqx.static_field()
     out_dim: int = eqx.static_field()
     num_features: int = eqx.static_field()
+    ard: bool = eqx.static_field()
     
     def __init__(
         self, 
@@ -19,6 +21,7 @@ class RFFARD(eqx.Module):
         num_features: int=10, 
         variance: float=0.1, 
         length_scale: float=0.01,
+        ard: bool=True,
         *,
         key=jrandom.PRNGKey(123)
     ):
@@ -27,9 +30,13 @@ class RFFARD(eqx.Module):
         self.in_dim = in_dim
         self.omega = omega
         self.out_dim = num_features * 2
+        if ard:
+            length_scale = [length_scale] * in_dim
+            
         self.log_variance = jnp.asarray(variance)
         self.log_length_scale = jnp.asarray(length_scale)
         self.num_features = num_features
+        self.ard = ard
         
     @property
     def length_scale(self):
@@ -62,6 +69,7 @@ class RFFARDCosine(eqx.Module):
     in_dim: int = eqx.static_field()
     out_dim: int = eqx.static_field()
     num_features: int = eqx.static_field()
+    ard: bool = eqx.static_field()
     
     def __init__(
         self, 
@@ -69,6 +77,7 @@ class RFFARDCosine(eqx.Module):
         num_features: int=10, 
         variance: float=0.1, 
         length_scale: float=0.01,
+        ard: bool=True,
         *,
         key=jrandom.PRNGKey(123)
     ):
@@ -77,9 +86,12 @@ class RFFARDCosine(eqx.Module):
         self.in_dim = in_dim
         self.omega = omega
         self.out_dim = num_features * 2
+        if ard:
+            length_scale = [length_scale] * in_dim
         self.log_variance = jnp.asarray(variance)
         self.log_length_scale = jnp.asarray(length_scale)
         self.num_features = num_features
+        self.ard = ard
         
     @property
     def length_scale(self):
@@ -114,6 +126,7 @@ class RFFArcCosine(eqx.Module):
     in_dim: int = eqx.static_field()
     out_dim: int = eqx.static_field()
     num_features: int = eqx.static_field()
+    ard: bool = eqx.static_field()
     
     def __init__(
         self, 
@@ -121,6 +134,7 @@ class RFFArcCosine(eqx.Module):
         num_features: int=10, 
         variance: float=0.1, 
         length_scale: float=0.1,
+        ard: bool=False,
         *,
         key=jrandom.PRNGKey(123)
     ):
@@ -134,6 +148,10 @@ class RFFArcCosine(eqx.Module):
         self.out_dim = num_features * 2
         self.log_variance = jnp.asarray(sigma)
         self.num_features = num_features
+        if ard:
+            length_scale = [length_scale] * in_dim
+        self.log_length_scale = jnp.asarray(length_scale)
+        self.ard = ard
         
     @property
     def length_scale(self):
@@ -169,27 +187,28 @@ class RFFLayer(eqx.Module):
         variance: float=0.1, 
         length_scale: float=0.01,
         use_bias: bool=True,
-        method: str="ard",
+        method: str="rbf",
+        ard: bool=False,
         *,
         key=jrandom.PRNGKey(123)
     ):
-        if method == "ard_cos":
+        if method == "rbf_cos":
             self.rff_layer = RFFARDCosine(
                 in_dim=in_dim, num_features=num_features,
                 variance=variance, length_scale=length_scale,
-                key=key
+                ard=ard, key=key
             )
-        elif method == "ard":
+        elif method == "rbf":
             self.rff_layer = RFFARD(
                 in_dim=in_dim, num_features=num_features,
                 variance=variance, length_scale=length_scale,
-                key=key
+                ard=ard, key=key
             )
         elif method == "arcosine":
             self.rff_layer = RFFArcCosine(
                 in_dim=in_dim, num_features=num_features,
                 variance=variance, length_scale=length_scale,
-                key=key
+                ard=ard, key=key
             )
         else:
             raise ValueError(f"Unrecognized method: {method}")
@@ -207,3 +226,75 @@ class RFFLayer(eqx.Module):
         x = self.linear_layer(x, key=key)
                 
         return x    
+    
+    
+class RFFNet(eqx.Module):
+    layers: Tuple[RFFLayer,...]
+    in_size: int = eqx.static_field()
+    out_size: int = eqx.static_field()
+    width_size: int = eqx.static_field()
+    num_features: int = eqx.static_field()
+    depth: int = eqx.static_field()
+    ard: str = eqx.static_field()
+    method: bool = eqx.static_field()
+    
+    def __init__(self,
+                 in_size: int,
+                 out_size: int,
+                 width_size: int,
+                 depth: int,
+                 num_features: int=64,
+                 ard: bool=False,
+                 method: str="rbf",
+                 *,
+                 key=jrandom.PRNGKey(123),
+                ):
+        
+        keys = jrandom.split(key, depth)
+        
+        layers = []
+        
+        if depth == 0:
+            layers.append(
+                RFFLayer(
+                    in_dim=in_size, out_dim=out_size, 
+                    num_features=num_features, method=method, ard=ard, key=keys[0]
+                )
+            )
+        else:
+            
+            layers.append(
+                RFFLayer(
+                    in_dim=in_size, out_dim=width_size, 
+                    num_features=num_features, method=method, ard=ard, key=keys[0]
+                )
+            )
+            for i in range(depth - 2):
+                layers.append(
+                    RFFLayer(
+                        in_dim=width_size, out_dim=width_size, 
+                        num_features=num_features, method=method, ard=ard, key=keys[i+1])
+                    
+                )
+            layers.append(
+                RFFLayer(
+                    in_dim=width_size, out_dim=out_size, 
+                    num_features=num_features, method=method, ard=ard, key=keys[-1]
+                )
+            )
+            
+        self.layers = tuple(layers)
+        self.in_size = in_size
+        self.out_size = out_size
+        self.width_size = width_size
+        self.depth = depth
+        self.num_features = num_features
+        self.ard = ard
+        self.method = method
+        
+        
+    def __call__(self, x: Array, *, key: Optional[jrandom.PRNGKey]=None) -> Array:
+        
+        for layer in self.layers:
+            x = layer(x)
+        return x

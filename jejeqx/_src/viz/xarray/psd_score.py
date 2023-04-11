@@ -35,8 +35,7 @@ def plot_psd_isotropic_score(
         np.ma.min(np.ma.masked_invalid(da.freq_r.values * factor)),
         np.ma.max(np.ma.masked_invalid(da.freq_r.values * factor)),
     ))
-    
-    resolved_scale = factor / da.attrs["resolved_scale"]
+    resolved_scale = factor / da.attrs["resolved_scale_space"]
     
     ax.vlines(
         x=resolved_scale, ymin=0, ymax=0.5, color=color, linewidth=2, 
