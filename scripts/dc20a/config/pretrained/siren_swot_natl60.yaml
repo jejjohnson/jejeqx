@@ -1,0 +1,2 @@
+config: "/gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/siren/swot1nadir5/pretrained/config.pkl"
+checkpoint: "/gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/siren/swot1nadir5/pretrained/checkpoint_model.ckpt"

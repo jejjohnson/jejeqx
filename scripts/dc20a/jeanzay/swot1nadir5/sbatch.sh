@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=nadir4                # name of job
+#SBATCH --job-name=swotnadir                # name of job
 #SBATCH --account=yrf@v100                   # for statistics
 #SBATCH --nodes=1                            # we ALWAYS request one node
 #SBATCH --ntasks-per-node=1                  # number of tasks per node
@@ -8,8 +8,8 @@
 #SBATCH --gres=gpu:1                         # number of GPUs (1/4 of GPUs)
 #SBATCH --qos=qos_gpu-t3                     # GPU partition (max 20 hrs)
 #SBATCH --time=20:00:00                      # maximum execution time requested (HH:MM:SS)
-#SBATCH --output=/gpfsscratch/rech/cli/uvo53rl/logs/nerf4ssh_dc20_nadir4_%j.log      # name of output file
-#SBATCH --error=/gpfsscratch/rech/cli/uvo53rl/errs/nerf4ssh_dc20_nadir4_%j.err       # name of error file
+#SBATCH --output=/gpfsscratch/rech/cli/uvo53rl/logs/nerf4ssh_dc20_swot_%j.log      # name of output file
+#SBATCH --error=/gpfsscratch/rech/cli/uvo53rl/errs/nerf4ssh_dc20_swot_%j.err       # name of error file
 #SBATCH --export=ALL
 #SBATCH --signal=SIGUSR1@90
 
@@ -30,4 +30,4 @@ export PYTHONPATH=/gpfswork/rech/cli/uvo53rl/projects/jejeqx:${PYTHONPATH}
 source activate jejeqx
 
 # TRAIN NADIR Simulations
-srun /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/jeanzay/nadir4/train.sh
+srun /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/jeanzay/swot1nadir5/train.sh

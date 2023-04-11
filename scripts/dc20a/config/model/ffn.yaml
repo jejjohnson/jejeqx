@@ -1,0 +1,14 @@
+_target_: jejeqx._src.nets.nerfs.base.NerF
+
+basis_net:
+    _target_: jejeqx._src.nets.nerfs.ffn.RFFNet
+    in_size: 4
+    out_size: 1
+    num_features: 256
+    width_size: 128
+    depth: 5
+    key:
+        _target_: jax.random.PRNGKey
+        seed: 123
+network:
+    _target_: equinox.nn.Identity

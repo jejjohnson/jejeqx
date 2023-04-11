@@ -9,8 +9,9 @@ defaults:
     - temporal_transforms: default.yaml
     - evaluation: natl60_lores.yaml
     - logger: wandb_jz.yaml
-    - saved: siren_nadir.yaml
+    - pretrained: siren_nadir.yaml
     
     
-num_epochs: 10
+num_epochs: 100
 stage: "train"
+dataset: null

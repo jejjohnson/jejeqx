@@ -127,12 +127,12 @@ def main(cfg):
     x_init, t_init, y_init = init["spatial"], init["temporal"], init["data"]
     
     
-    logger.info(cfg.saved.config)
-    logger.info(cfg.saved.checkpoint)
-    if cfg.saved.config is not None and cfg.saved.checkpoint is not None:
+    logger.info(cfg.pretrained.config)
+    logger.info(cfg.pretrained.checkpoint)
+    if cfg.pretrained.config is not None and cfg.pretrained.checkpoint is not None:
         logger.info(f"Loading old model...")
-        logger.info(f"{cfg.saved.config}")
-        old_config = joblib.load(cfg.saved.config)
+        logger.info(f"{cfg.pretrained.config}")
+        old_config = joblib.load(cfg.pretrained.config)
         logger.info(f"Initializing model...")
         model = hydra.utils.instantiate(old_config["model"])
         logger.info(f"Updating config...")
@@ -164,10 +164,10 @@ def main(cfg):
     logger.info(f"Loss (PSNR): {metrics['psnr']:.4f}")
     
 
-    if cfg.saved.config is not None and cfg.saved.checkpoint is not None:
+    if cfg.pretrained.config is not None and cfg.pretrained.checkpoint is not None:
         logger.info(f"Loading old checkpoint...")
-        logger.info(f"{cfg.saved.checkpoint}")
-        checkpoint_file = cfg.saved.checkpoint
+        logger.info(f"{cfg.pretrained.checkpoint}")
+        checkpoint_file = cfg.pretrained.checkpoint
         trainer.load_model(checkpoint_file)
         
         out, metrics = trainer.test_model(dm.test_dataloader())
@@ -176,8 +176,11 @@ def main(cfg):
         logger.info(f"Loss (PSNR): {metrics['psnr']:.4f}")
     
     
+    logger.info(f"Starting Training...")
     train_metrics = trainer.train_model(dm, num_epochs=cfg.num_epochs)
+    logger.info(f"Finished Training...!")
     
+    logger.info(f"Starting Testing...")
     out, test_metrics = trainer.test_model(dm.test_dataloader())
     logger.info(f"Loss (MSE): {test_metrics['loss']:.2e}")
     logger.info(f"Loss (PSNR): {test_metrics['psnr']:.4f}")

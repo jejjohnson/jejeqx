@@ -30,4 +30,5 @@ export PYTHONPATH=/gpfswork/rech/cli/uvo53rl/projects/jejeqx:${PYTHONPATH}
 source activate jejeqx
 
 # TRAIN NATL60 Simulations
-srun /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/jeanzay/natl60sim/train.sh
+#srun /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/jeanzay/natl60sim/train.sh
+srun /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/jeanzay/natl60sim/train_more.sh
