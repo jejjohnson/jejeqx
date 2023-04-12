@@ -183,7 +183,8 @@ def plot_analysis_vars(ds: List[xr.Dataset], names: List[str]=None, figsize=None
     for iax, ids in zip(ax[3] if cond(ax[3]) else [ax[3]], ds):
         cbar_kwargs = {"label": get_cbar_label(ids.ke)}
         ids.ke.plot.pcolormesh(
-            ax=iax, cmap="YlGnBu_r", vmin=vmin, vmax=vmax, cbar_kwargs=cbar_kwargs
+            ax=iax, cmap="YlGnBu_r", #vmin=vmin, vmax=vmax, 
+            robust=True, cbar_kwargs=cbar_kwargs
         )
         iax.set_aspect('equal', 'box')
     
@@ -193,18 +194,20 @@ def plot_analysis_vars(ds: List[xr.Dataset], names: List[str]=None, figsize=None
     for iax, ids in zip(ax[4] if cond(ax[4]) else [ax[4]], ds):
         cbar_kwargs = {"label": get_cbar_label(ids.vort_r)}
         ids.vort_r.plot.pcolormesh(
-            ax=iax, cmap="RdBu_r", vmin=vmin, vmax=vmax, cbar_kwargs=cbar_kwargs
+            ax=iax, cmap="RdBu_r", #vmin=vmin, vmax=vmax, 
+            cbar_kwargs=cbar_kwargs
         )
         iax.set_aspect('equal', 'box')
     
     
     # STRAIN
-    vmin = np.min([ids.strain.min() for ids in ds])
-    vmax = np.max([ids.strain.max() for ids in ds])
+    vmin = 0.001 * np.min([ids.strain.min() for ids in ds])
+    vmax = 0.995 * np.max([ids.strain.max() for ids in ds])
     for iax, ids in zip(ax[5] if cond(ax[5]) else [ax[5]], ds):
         cbar_kwargs = {"label": get_cbar_label(ids.strain)}
         ids.strain.plot.pcolormesh(
-            ax=iax, cmap=cmo.cm.speed, vmin=vmin, vmax=vmax, cbar_kwargs=cbar_kwargs
+            ax=iax, cmap=cmo.cm.speed, #vmin=vmin, vmax=vmax,
+            robust=True, cbar_kwargs=cbar_kwargs
         )
         iax.set_aspect('equal', 'box')
         
@@ -229,7 +232,7 @@ def plot_analysis_psd_iso(ds: List[xr.Dataset], names: List[str]):
     
     ncols = len(ds)
     
-    fig, ax = plt.subplots(nrows=7, ncols=1, figsize=(5, 25))
+    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(5, 15))
     
     # SSH
     for iname, ids in zip(names, ds):
@@ -238,42 +241,42 @@ def plot_analysis_psd_iso(ds: List[xr.Dataset], names: List[str]):
         plot_psd_isotropic(ids.ssh, units=units, scale=scale, ax=ax[0], label=iname)
 
     
-    # U
-    for iname, ids in zip(names, ds):
-        scale = "km"
-        units = "U-Velocity"
-        plot_psd_isotropic(ids.u, units=units, scale=scale, ax=ax[1], label=iname)
+    ## U
+    #for iname, ids in zip(names, ds):
+    #    scale = "km"
+    #    units = "U-Velocity"
+    #    plot_psd_isotropic(ids.u, units=units, scale=scale, ax=ax[1], label=iname)
     
-    # v
-    for iname, ids in zip(names, ds):
-        scale = "km"
-        units = "V-Velocity"
-        plot_psd_isotropic(ids.v, units=units, scale=scale, ax=ax[2], label=iname)
+    # # v
+    #for iname, ids in zip(names, ds):
+    #    scale = "km"
+    #    units = "V-Velocity"
+    #    plot_psd_isotropic(ids.v, units=units, scale=scale, ax=ax[2], label=iname)
     
     # Kinetic Energy
     for iname, ids in zip(names, ds):
         scale = "km"
         units = "Kinetic Energy"
-        plot_psd_isotropic(ids.ke, units=units, scale=scale, ax=ax[3], label=iname)
+        plot_psd_isotropic(ids.ke, units=units, scale=scale, ax=ax[1], label=iname)
 
     # Relative Vorticity
     for iname, ids in zip(names, ds):
         scale = "km"
         units = "Relative Vorticity"
-        plot_psd_isotropic(ids.vort_r, units=units, scale=scale, ax=ax[4], label=iname)
+        plot_psd_isotropic(ids.vort_r, units=units, scale=scale, ax=ax[2], label=iname)
     
     
     # STRAIN
     for iname, ids in zip(names, ds):
         scale = "km"
         units = "Strain"
-        plot_psd_isotropic(ids.strain, units=units, scale=scale, ax=ax[5], label=iname)
+        plot_psd_isotropic(ids.strain, units=units, scale=scale, ax=ax[3], label=iname)
         
-    # STRAIN
-    for iname, ids in zip(names, ds):
-        scale = "km"
-        units = "Okubo-Weiss"
-        plot_psd_isotropic(ids.ow, units=units, scale=scale, ax=ax[6], label=iname)
+    ## STRAIN
+    #for iname, ids in zip(names, ds):
+    #    scale = "km"
+    #    units = "Okubo-Weiss"
+     #   plot_psd_isotropic(ids.ow, units=units, scale=scale, ax=ax[6], label=iname)
     
     
     
@@ -303,6 +306,7 @@ def plot_analysis_psd_iso_score(
             name=iname,
             color=icolor
         )
+        plt.legend()
 
     # Kinetic Energy
     labels = []

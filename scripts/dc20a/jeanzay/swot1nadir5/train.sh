@@ -28,7 +28,7 @@ Training script for SWOT1NADIR5 data challenge
 # ===============================================
 python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     stage="train" \
-    num_epochs=5000 \
+    num_epochs=1000 \
     data=swot \
     model=ffn \
     evaluation=natl60_dc20a \
