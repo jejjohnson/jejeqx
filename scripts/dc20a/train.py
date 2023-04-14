@@ -11,6 +11,7 @@ from pathlib import Path
 import wandb
 from omegaconf import OmegaConf
 import joblib
+import utils
 
 
 class RegressorTrainer(TrainerModule):
@@ -200,6 +201,60 @@ def main(cfg):
     out, eval_metrics = trainer.test_model(dm_eval.test_dataloader())
     logger.info(f"Loss (MSE): {eval_metrics['loss']:.2e}")
     logger.info(f"Loss (PSNR): {eval_metrics['psnr']:.4f}")
+    
+    
+    logger.info(f"Create xarray dataset...")
+    xrda = dm_eval.load_xrds()
+    
+    logger.info(f"Create add predictions to model...")
+    xrda["ssh_model"] = dm_eval.data_to_df(out).to_xarray().sossheig
+    
+    logger.info(f"Calculate Physical Quantities...")
+    ds_model = utils.calculate_physical_quantities(xrda.ssh_model)
+    ds_natl60 = utils.calculate_physical_quantities(xrda.sossheig)
+    
+    logger.info(f"SpatialTemporal Statistics...")
+    
+    for ivar in ds_model:
+        
+        
+        rmse_xyt = utils.nrmse_da(ds_model[ivar], ds_natl60[ivar], dim=["lat", "lon", "time"])
+        logger.info(f"nrmse [mean]: {rmse_xyt:.2f} [{ivar.upper()}]")
+        wandb_logger.log_metrics({f"{ivar}_nrmse_mean": rmse_xyt})
+        
+        
+        rmse_t = utils.nrmse_da(ds_model[ivar], ds_natl60[ivar], dim=["lat", "lon"]).std()
+        logger.info(f"nrmse [std]: {rmse_t:.2f} [{ivar.upper()}]")
+        wandb_logger.log_metrics({f"{ivar}_nrmse_std": rmse_t})
+    
+    logger.info(f"Calculate PSD Isotropic Scores...")
+    ds_psd_score = utils.calculate_isotropic_psd_score(ds_model, ds_natl60)
+    
+    logger.info(f"Resolved Isotropic Scales:")
+    for ivar in ds_psd_score:
+        resolved_spatial_scale = ds_psd_score[ivar].attrs["resolved_scale_space"] / 1e3 
+        logger.info(f"Wavelength [km]: {resolved_spatial_scale:.2f} [{ivar.upper()}]")
+        logger.info(f"Wavelength [degree]: {resolved_spatial_scale/111:.2f} [{ivar.upper()}]")
+        wandb_logger.log_metrics({f"{ivar}_iso_psd_spatial_km": resolved_spatial_scale})
+        wandb_logger.log_metrics({f"{ivar}_iso_psd_spatial_degree": resolved_spatial_scale/111})
+    
+    logger.info(f"PSD SpaceTime Scores")
+    ds_psd_score = utils.calculate_spacetime_psd_score(ds_model, ds_natl60)
+    
+    logger.info(f"Resolved SpaceTime Scales:")
+    for ivar in ds_psd_score:
+        resolved_spatial_scale = ds_psd_score[ivar].attrs["resolved_scale_space"] / 1e3
+        
+        wandb_logger.log_metrics({f"{ivar}_psd_spatial_km": resolved_spatial_scale})
+        logger.info(f"Wavelength [km]: {resolved_spatial_scale:.2f} [{ivar.upper()}]")
+        
+        wandb_logger.log_metrics({f"{ivar}_psd_spatial_degree": resolved_spatial_scale/111})
+        logger.info(f"Wavelength [degree]: {resolved_spatial_scale/111:.2f} [{ivar.upper()}]")
+        
+        resolved_temporal_scale = ds_psd_score[ivar].attrs["resolved_scale_time"]
+        wandb_logger.log_metrics({f"{ivar}_psd_time_days": resolved_temporal_scale})
+        logger.info(f"Period [days]: {resolved_temporal_scale:.2f}  [{ivar.upper()}]")
+    
     
     
 

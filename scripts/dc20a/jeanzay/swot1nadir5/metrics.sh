@@ -8,7 +8,7 @@ Metrics Script for SWOT1NADIR5
 #    data=swot \
 #    evaluation=natl60_dc20a \
 #    ++logger.mode="disabled" \
-#    pretrained=siren_swot_natl60
+#    pretrained=siren_swot
 
 
 python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
@@ -16,7 +16,7 @@ python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     data=swot \
     evaluation=natl60_dc20a \
     ++logger.mode="disabled" \
-    pretrained=siren_swot
+    pretrained=ffn_nadir
     
 
 

@@ -6,12 +6,13 @@
 # ===============================================
 #python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
 #    stage="train" \
-#    num_epochs=5000 \
+#    num_epochs=1000 \
 #    data=nadir \
 #    evaluation=natl60_dc20a \
-#    pretrained=siren_nadir \
+#    pretrained=default \
+#    ++data.batch_size=32 \
 #    ++logger.mode="offline" \
-#    ++optimizer.learning_rate=1e-5 \
+#    ++optimizer.learning_rate=1e-4 \
 #    ++data.train_size=0.90 \
 #    dataset="nadir4"
 
@@ -22,16 +23,28 @@
 # ===============================================
 python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     stage="train" \
-    num_epochs=10000 \
+    num_epochs=1000 \
     data=nadir \
     model=ffn \
     evaluation=natl60_dc20a \
     pretrained=default \
-    ++model.basis_net.depth=5 \
+    ++data.batch_size=32 \
     ++logger.mode="offline" \
-    ++optimizer.learning_rate=1e-4 \
+    ++optimizer.learning_rate=1e-5 \
     ++data.train_size=0.90 \
+    ++model.basis_net.ard=False \
     dataset="nadir4"
-    
+ 
+#python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
+#    stage="train" \
+#    num_epochs=5 \
+#    data=nadir \
+#    model=ffn \
+#    evaluation=natl60_dc20a \
+#    pretrained=default \
+#    ++logger.mode="disabled" \
+#    ++optimizer.learning_rate=1e-4 \
+#    ++data.train_size=0.90 \
+#    dataset="nadir4"
     
     

@@ -446,3 +446,16 @@ def plot_analysis_psd_spacetime_score(ds: List[xr.Dataset], names: List[str]):
     
     plt.tight_layout()
     return fig, ax
+
+
+def rmse_da(da, da_ref, dim):
+    return ((da - da_ref) ** 2).mean(dim=dim) ** 0.5
+
+
+def nrmse_da(da, da_ref, dim):
+    rmse = rmse_da(da=da, da_ref=da_ref, dim=dim)
+    std = (da_ref**2).mean(dim=dim) ** 0.5 
+    try:
+        return 1.0 - (rmse / std).data.magnitude
+    except:
+        return 1.0 - (rmse / std)

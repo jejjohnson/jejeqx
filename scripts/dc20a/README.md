@@ -44,7 +44,7 @@ python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/si
 #### Random Fourier Features
 
 ```python
-python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/ffn/nadir4/scratch -r ige/jax4eo/imexd5f1 -c ige/jax4eo/experiments-ckpts:v34
+python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/ffn/nadir4/scratch -r ige/jax4eo/1agsp373 -c ige/jax4eo/experiments-ckpts:v41
 ```
 
 ### Trained More
@@ -63,16 +63,30 @@ python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/si
 ## SWOT
 
 
+
 ### From Scratch
 
+#### SIREN
+
 ```bash
-python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/siren/swot1nadir5/scratch -r ige/jax4eo/fzogznlx -c ige/jax4eo/experiments-ckpts:v35
+python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/siren/swot1nadir5/scratch -r ige/jax4eo/o93rers5 -c ige/jax4eo/experiments-ckpts:v44
 ```
+
+#### MLP
+
+
+#### RFF
+
+
+```bash
+python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/ffn/swot1nadir5/scratch -r ige/jax4eo/labo174g -c ige/jax4eo/experiments-ckpts:v45
+```
+
 
 
 ### PreTrained
 
 
 ```bash
-python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/siren/swot1nadir5/pretrained -r ige/jax4eo/qgqj6e7a -c ige/jax4eo/experiments-ckpts:v33
+python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/siren/swot1nadir5/pretrained -r ige/jax4eo/qgqj6e7a -c ige/jax4eo/experiments-ckpts:v38
 ```
