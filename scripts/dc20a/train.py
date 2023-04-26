@@ -9,10 +9,12 @@ from jejeqx._src.losses import psnr
 import equinox as eqx
 from pathlib import Path
 import wandb
+import optax
 from omegaconf import OmegaConf
 import joblib
 import utils
-
+import os
+os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = 'false'
 
 class RegressorTrainer(TrainerModule):
     def __init__(self,
@@ -148,6 +150,16 @@ def main(cfg):
     
     logger.info(f"Initializing optimizer...")
     optimizer = hydra.utils.instantiate(cfg.optimizer)
+
+    if cfg.lr_scheduler.scheduler is not None:
+        logger.info(f"Initializing scheduler...")
+
+        scheduler = hydra.utils.instantiate(
+            cfg.lr_scheduler.scheduler, 
+            decay_steps=int(cfg.num_epochs * len(dm.ds_train))
+        )
+        optimizer = optax.chain(optimizer, optax.scale_by_schedule(scheduler))
+
     
     logger.info(f"Initializing Trainer...")
     trainer = RegressorTrainer(

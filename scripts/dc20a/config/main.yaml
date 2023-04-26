@@ -5,6 +5,7 @@ defaults:
     - data: nadir.yaml
     - model: siren.yaml
     - optimizer: adam.yaml
+    - lr_scheduler: default.yaml
     - spatial_transforms: default.yaml
     - temporal_transforms: default.yaml
     - evaluation: natl60_lores.yaml

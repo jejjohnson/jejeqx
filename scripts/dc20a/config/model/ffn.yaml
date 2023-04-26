@@ -4,8 +4,8 @@ basis_net:
     _target_: jejeqx._src.nets.nerfs.ffn.RFFNet
     in_size: 4
     out_size: 1
-    num_features: 256
-    width_size: 128
+    num_features: 128
+    width_size: 256
     depth: 5
     key:
         _target_: jax.random.PRNGKey

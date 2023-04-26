@@ -10,4 +10,4 @@ coarsen:
     lat: 4
 resample: "1D"
 select: 
-    time: {_target_: builtins.slice, _args_: ["2013-01-01", "2013-10-01"]}
+    time: {_target_: builtins.slice, _args_: ["2012-01-01", "2013-10-01"]}

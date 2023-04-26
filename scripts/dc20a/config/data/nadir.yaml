@@ -5,7 +5,7 @@ shuffle: True
 train_size: 0.90
 spatial_coords: ["lat", "lon"]
 temporal_coords: ["time"]
-variables: ["ssh_obs"]
+variables: ["ssh"]
 evaluation: False
 select: 
     time: {_target_: builtins.slice, _args_: ["2012-10-01", "2013-10-01"]}
