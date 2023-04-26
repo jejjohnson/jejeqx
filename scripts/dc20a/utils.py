@@ -28,23 +28,23 @@ def calculate_physical_quantities(da: xr.DataArray) -> xr.Dataset:
     # SSH
     ds = geocalc.get_ssh_dataset(da)
     
-    # Stream Function
-    ds = geocalc.calculate_streamfunction(ds, "ssh")
+    # # Stream Function
+    # ds = geocalc.calculate_streamfunction(ds, "ssh")
     
-    # U,V Velocities
-    ds = geocalc.calculate_velocities_sf(ds, "psi")
+    # # U,V Velocities
+    # ds = geocalc.calculate_velocities_sf(ds, "psi")
     
-    # Kinetic Energy
-    ds = geocalc.calculate_kinetic_energy(ds, ["u","v"])
+    # # Kinetic Energy
+    # ds = geocalc.calculate_kinetic_energy(ds, ["u","v"])
     
-    # Relative Vorticity
-    ds = geocalc.calculate_relative_vorticity_uv(ds, ["u","v"], normalized=True)
+    # # Relative Vorticity
+    # ds = geocalc.calculate_relative_vorticity_uv(ds, ["u","v"], normalized=True)
     
-    # Strain
-    ds = geocalc.calculate_strain_magnitude(ds, ["u","v"], normalized=True)
+    # # Strain
+    # ds = geocalc.calculate_strain_magnitude(ds, ["u","v"], normalized=True)
     
-    # Okubo-Weiss
-    ds = geocalc.calculate_okubo_weiss(ds, ["u","v"], normalized=True)
+    # # Okubo-Weiss
+    # ds = geocalc.calculate_okubo_weiss(ds, ["u","v"], normalized=True)
     
     return ds
 
@@ -71,7 +71,10 @@ def calculate_isotropic_psd(ds, freq_dt=1, freq_unit="D"):
     ds = latlon_deg2m(ds, mean=True)
     ds = time_rescale(ds, freq_dt, freq_unit)
     
-    variables = ["ssh", "u", "v", "ke", "vort_r", "strain", "ow"]
+    variables = [
+        "ssh", 
+        # "u", "v", "ke", "vort_r", "strain", "ow"
+        ]
     
     # calculate isotropic PSDs
     ds_psd = xr.Dataset()
@@ -93,7 +96,10 @@ def calculate_isotropic_psd_score(ds, ds_ref):
     ds_ref = latlon_deg2m(ds_ref, mean=True)
     ds_ref = time_rescale(ds_ref, freq_dt, freq_unit)
     
-    variables = ["ssh", "ke", "vort_r", "strain", ]
+    variables = [
+        "ssh", 
+        # "ke", "vort_r", "strain", 
+        ]
     dims = ["lat", "lon"]
     
     ds_psd_score = xr.Dataset()
@@ -120,7 +126,10 @@ def calculate_spacetime_psd_score(ds, ds_ref):
     ds_ref = latlon_deg2m(ds_ref, mean=True)
     ds_ref = time_rescale(ds_ref, freq_dt, freq_unit)
     
-    variables = ["ssh", "ke", "vort_r", "strain"]
+    variables = [
+        "ssh", 
+        # "ke", "vort_r", "strain"
+    ]
     dims = ["time", "lon"]
     
     ds_psd_score = xr.Dataset()

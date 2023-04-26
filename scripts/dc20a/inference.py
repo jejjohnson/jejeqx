@@ -108,7 +108,7 @@ def main(cfg):
         )
     dm_eval.setup()
     
-    logger.info(f"Number Training: {len(dm_eval.ds_test):_}")
+    logger.info(f"Number Testing: {len(dm_eval.ds_test):_}")
     
     logger.info(f"Testing on Evaluation...")
     out, eval_metrics = trainer.test_model(dm_eval.test_dataloader())
@@ -120,6 +120,10 @@ def main(cfg):
     
     logger.info(f"Create add predictions to model...")
     xrda["ssh_model"] = dm_eval.data_to_df(out).to_xarray().sossheig
+
+    logger.info(f"Saving results_field...")
+    save_path = Path(cfg.results.path).joinpath(f"{cfg.results.name}.nc")
+    xrda.ssh_model.to_dataset(name=cfg.results.variable).to_netcdf(save_path)
     
 
     logger.info(f"Calculate Physical Quantities...")

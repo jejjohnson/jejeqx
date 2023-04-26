@@ -10,6 +10,7 @@ defaults:
     - evaluation: natl60_lores.yaml
     - logger: wandb_jz.yaml
     - pretrained: siren_nadir.yaml
+    - results: default.yaml
     
     
 num_epochs: 100

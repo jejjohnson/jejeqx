@@ -1,7 +1,9 @@
 #!/bin/bash
-"""
-Metrics Script for NADIR4
-"""
+#
+# Inference + Metrics Script for data challenge dc20
+# Various NerF Models - MLP, RFF, SIREN
+# Various Datasets - NADIR4, 
+#
 
 ## SIREN
 #python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
@@ -26,13 +28,16 @@ Metrics Script for NADIR4
 #    pretrained=siren_nadir_more
     
 
+# FOURIER FEATURES 
 
+# SCRATCH | NADIR4 | SUBSET
 python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     stage="inference" \
     data=nadir \
     evaluation=natl60_dc20a \
     ++logger.mode="disabled" \
-    pretrained=ffn_nadir
+    pretrained=ffn_nadir \
+    ++results.name="ffn_nadir"
 
     
 #python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \

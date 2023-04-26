@@ -43,8 +43,15 @@ python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/si
 
 #### Random Fourier Features
 
+| Checkpoint | Run | Type | Training | Run | 
+| `ige/jax4eo/experiments-ckpts:v50` | `ige/jax4eo/tzmywo1b` | FFN | Scratch | https://wandb.ai/ige/jax4eo/runs/tzmywo1b/overview?workspace=user-emanjohnson91 |
+
+```bash
+ige/jax4eo/experiments-ckpts:v50
+```
+
 ```python
-python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/ffn/nadir4/scratch -r ige/jax4eo/1agsp373 -c ige/jax4eo/experiments-ckpts:v41
+python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/ffn/nadir4/scratch -r ige/jax4eo/tzmywo1b -c ige/jax4eo/experiments-ckpts:v50
 ```
 
 ### Trained More
