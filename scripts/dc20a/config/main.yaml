@@ -8,7 +8,7 @@ defaults:
     - lr_scheduler: default.yaml
     - spatial_transforms: default.yaml
     - temporal_transforms: default.yaml
-    - evaluation: natl60_lores.yaml
+    - evaluation: natl60_dc20a.yaml
     - logger: wandb_jz.yaml
     - pretrained: siren_nadir.yaml
     - results: default.yaml

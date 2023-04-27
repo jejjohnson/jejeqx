@@ -29,17 +29,52 @@ export PYTHONPATH=/gpfswork/rech/cli/uvo53rl/projects/jejeqx:${PYTHONPATH}
 # load modules
 source activate jejeqx
 
-# TRAIN NADIR Simulations
+########################
+# TRAIN
+########################
 # srun /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/jeanzay/swot1nadir5_dc20a/train_swotnadir_siren.sh
 srun python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     stage="train" \
-    num_epochs=1000 \
+    num_epochs=500 \
     data=swot_dc20a \
     model=siren \
     evaluation=natl60_dc20a \
     pretrained=default \
-    ++data.batch_size=5012 \
+    ++data.batch_size=50_000 \
     ++logger.mode="offline" \
     ++optimizer.learning_rate=1e-4 \
     ++data.train_size=0.90 \
     dataset="swot1nadir5"
+
+# ########################
+# # TRAIN MORE
+# ########################
+# srun python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
+#     stage="train" \
+#     num_epochs=100 \
+#     data=swot_dc20a \
+#     model=siren \
+#     evaluation=natl60_dc20a \
+#     pretrained=siren_swotnadir_dc20a \
+#     ++data.batch_size=50_000 \
+#     ++logger.mode="offline" \
+#     ++optimizer.learning_rate=5e-5 \
+#     ++data.train_size=0.90 \
+#     dataset="swot1nadir5"
+
+
+# ########################
+# # TRAIN PRETRAIN (NADIR)
+# ########################
+# srun python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
+#     stage="train" \
+#     num_epochs=500 \
+#     data=swot_dc20a \
+#     model=siren \
+#     evaluation=natl60_dc20a \
+#     pretrained=siren_nadir_dc20a \
+#     ++data.batch_size=50_000 \
+#     ++logger.mode="offline" \
+#     ++optimizer.learning_rate=5e-5 \
+#     ++data.train_size=0.90 \
+#     dataset="swot1nadir5"

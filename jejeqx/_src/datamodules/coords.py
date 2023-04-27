@@ -139,9 +139,7 @@ class AlongTrackDM(pl.LightningDataModule):
         x = ds[self.spatial_coords]
         t = ds[self.temporal_coords]
         y = ds[self.variables]
-        
-        print(x.columns, t.columns, y.columns)
-        
+                
         # do specific spatial-temporal-variable transformations
         if self.spatial_transform is not None:
             if not self.evaluation:

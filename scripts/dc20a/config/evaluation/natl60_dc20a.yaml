@@ -5,9 +5,6 @@ spatial_coords: ["lat", "lon"]
 temporal_coords: ["time"]
 variables: ["sossheig"]
 evaluation: True
-coarsen:
-    lon: 2
-    lat: 2
-resample: "1D"
+resample: "12h"
 select: 
     time: {_target_: builtins.slice, _args_: ["2012-10-22", "2012-12-02"]}
