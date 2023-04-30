@@ -16,20 +16,30 @@ class RegressionDataset(data.Dataset):
     
 
 class SpatioTempDataset(data.Dataset):
-    def __init__(self, space_coords, time_coords, data=None):
+    def __init__(
+        self, 
+        spatial_coords=None, 
+        temporal_coords=None, 
+        params=None, 
+        data=None
+        ):
         super().__init__()
-        self.space_coords = space_coords
-        self.time_coords = time_coords
+        self.spatial_coords = spatial_coords
+        self.temporal_coords = temporal_coords
+        self.params = params
         self.data = data
         
     def __len__(self):
-        return self.space_coords.shape[0]
+        return self.spatial_coords.shape[0]
     
     def __getitem__(self, idx):
         outputs = dict()
-        
-        outputs["spatial"] = self.space_coords[idx]
-        outputs["temporal"] = self.time_coords[idx]
+        if self.spatial_coords is not None:
+            outputs["spatial"] = self.spatial_coords[idx]
+        if self.temporal_coords is not None:
+            outputs["temporal"] = self.temporal_coords[idx]
+        if self.params is not None:
+            outputs["params"] = self.params[idx]
         if self.data is not None:
             outputs["data"] = self.data[idx]
         

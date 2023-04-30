@@ -33,14 +33,14 @@ source activate jejeqx
 # FOURIER FEATURE NETWORKS
 srun python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     stage="train" \
-    num_epochs=100 \
+    num_epochs=500 \
     data=swot \
     model=ffn \
     evaluation=natl60 \
     pretrained=default \
     dataset="natl60_swot" \
-    ++data.batch_size=10000 \
-    ++logger.mode="offline" \
+    ++data.batch_size=100_000 \
+    ++logger.mode="disabled" \
     ++optimizer.learning_rate=1e-4 \
     ++data.train_size=0.90 \
     ++model.basis_net.ard=False

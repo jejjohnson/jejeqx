@@ -2,6 +2,24 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import pandas as pd
 import numpy as np
 from jejeqx._src.transforms.spatial import spherical_to_cartesian_3d, cartesian_to_spherical_3d
+from metpy.calc import lat_lon_grid_deltas
+
+
+class LatLonDeg2Meters(BaseEstimator, TransformerMixin):
+    def __init__(self, units: str="degrees"):
+        self.units = units
+        
+    def fit(self, X: np.ndarray, y=None):
+        return self
+    
+    def transform(self, X: np.ndarray, y=None):
+        pass
+    
+    def inverse_transform(self, X: np.ndarray, y=None):
+        msg = "This method is not invertible..."
+        raise NotImplementedError(msg)
+        
+    
 
 
 class Spherical2Cartesian(BaseEstimator, TransformerMixin):

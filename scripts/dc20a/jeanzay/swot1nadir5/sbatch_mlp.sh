@@ -32,13 +32,13 @@ source activate jejeqx
 # TRAIN NADIR Simulations
 srun python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     stage="train" \
-    num_epochs=100 \
+    num_epochs=500 \
     data=swot \
     model=mlp \
     evaluation=natl60 \
     pretrained=default \
     dataset="natl60_swot" \
-    ++data.batch_size=10000 \
+    ++data.batch_size=100_000 \
     ++logger.mode="offline" \
     ++optimizer.learning_rate=1e-4 \
     ++data.train_size=0.90

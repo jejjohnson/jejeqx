@@ -34,14 +34,14 @@ source activate jejeqx
 # MLP
 srun python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     stage="train" \
-    num_epochs=2000 \
+    num_epochs=5000 \
     data=nadir \
     model=mlp \
     evaluation=natl60 \
     pretrained=default \
     dataset="natl60_nadir4" \
     lr_scheduler=warmup_cosine \
-    ++data.batch_size=5012 \
+    ++data.batch_size=10_000 \
     ++logger.mode="offline" \
     ++optimizer.learning_rate=1e-4 \
     ++lr_scheduler.warmup_steps=25 \

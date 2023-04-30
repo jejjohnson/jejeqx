@@ -69,23 +69,42 @@ class ShapeParamNerF(eqx.Module):
         return x
     
 
-class SpatioTempNerF(ShapeParamNerF):
-    time_encoder: eqx.Module
+class SpatioTempNerF(eqx.Module):
+    basis_net: eqx.Module
+    network: eqx.Module
+    spatial_encoder: eqx.Module
+    temporal_encoder: eqx.Module
     
-    def __init__(self, mod_shape_net, param_net, network, time_encoder, *, key):
-        super().__init__(
-            mod_shape_net=mod_shape_net,
-            param_net=param_net,
-            network=network,
-            key=key
-        )
-        self.time_encoder = time_encoder
+    def __init__(
+        self, 
+        basis_net: eqx.Module, 
+        network: eqx.Module = eqx.nn.Identity(), 
+        spatial_encoder: eqx.Module = eqx.nn.Identity(), 
+        temporal_encoder: eqx.Module = eqx.nn.Identity(),
+        data_encoder: eqx.Module = eqx.nn.Identity(),
+        *, 
+        key: jrandom.PRNGKey = jrandom.PRNGKey(123)
+    ):
+        self.basis_net = basis_net
+        self.network = network
+        self.spatial_encoder = spatial_encoder
+        self.temporal_encoder = temporal_encoder
         
-    def __call__(self, x: Array, t: Array, mu: Array, *, key: Optional[PRNGKey] = None):
+    def __call__(self, x: Array, t: Array, *, key: Optional[PRNGKey] = None):
+
+        x = self.spatial_encoder(x)
         
-        t = self.time_encoder(t)
+        t = self.temporal_encoder(t)
+                
+        x = jnp.hstack([x, t])
+
+        x = self.basis_net(x)
         
-        return super().__call__(x=x, mu=t, key=key)
+        x = self.network(x)
+
+        x = self.network(x, key=key)
+        
+        return x
         
     
     
