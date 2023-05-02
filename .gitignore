@@ -147,3 +147,4 @@ datasets/*
 \lightning_logs/
 *.idea
 \.idea/
+\notebooks/dev/nerfs/figures/

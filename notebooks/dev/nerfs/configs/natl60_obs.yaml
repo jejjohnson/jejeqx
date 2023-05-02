@@ -1,3 +1,129 @@
+domain:
+  lat: {_target_: "builtins.slice", _args_: [32., 44.]}
+  lon: {_target_: "builtins.slice", _args_: [-66., -54.]}
+  time: {_target_: "builtins.slice", _args_: ["2012-10-22", "2012-12-02"]}
+
+select:
+    _target_: "xarray.Dataset.sel"
+    _partial_: True
+    indexers: "${domain}"
+    
+    
+select_time:
+    _target_: "xarray.Dataset.sel"
+    _partial_: True
+    indexers:
+        time: "${domain.time}"
+    
+select_where_lon:
+    _target_: "oceanbench._src.geoprocessing.subset.where_slice"
+    _partial_: True
+    min_val: -66.
+    max_val: -54.
+    variable: "lon"
+    
+select_where_lat:
+    _target_: "oceanbench._src.geoprocessing.subset.where_slice"
+    _partial_: True
+    min_val: 32.
+    max_val: 44.
+    variable: "lat"
+
+    
+set_coords:
+    _target_: "xarray.Dataset.set_coords"
+    _partial_: True
+    names: ["lat", "lon", "time"]
+    
+# DUACS
+ALONGTRACK_NADIR4:
+    name: "ssh_obs"
+    experiment: "nadir4"
+    variable: "ssh_mod"
+    data:
+        _target_: "oceanbench._src.data.pipe"
+        inp: "/gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/staging/ml_ready/nadir4.nc"
+        fns:
+            - {_target_: "xarray.open_dataset", decode_times: True, _partial_: True}
+            # VALIDATE COORDINATES
+            - "${set_coords}"
+            - {_target_: "jejeqx._src.transforms.spatial.validate_lon", _partial_: True}
+            - {_target_: "jejeqx._src.transforms.spatial.validate_lat", _partial_: True}
+            - {_target_: "jejeqx._src.transforms.temporal.validate_time", _partial_: True}
+            # RESCALE TIME
+            - {_target_: "jejeqx._src.transforms.temporal.decode_cf_time", units: "seconds since 2012-10-01", _partial_: true}
+            - {_target_: "jejeqx._src.transforms.xarray.spatial.transform_360_to_180", _partial_: True}
+            # SELECT REGION
+            - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
+            - "${select_time}"
+            
+            
+# DUACS
+ALONGTRACK_SWOT:
+    name: "ssh_obs"
+    experiment: "nadir4"
+    variable: "ssh_mod"
+    data:
+        _target_: "oceanbench._src.data.pipe"
+        inp: "/gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/staging/ml_ready/swot.nc"
+        fns:
+            - {_target_: "xarray.open_dataset", decode_times: True, _partial_: True}
+            # VALIDATE COORDINATES
+            - "${set_coords}"
+            - {_target_: "jejeqx._src.transforms.spatial.validate_lon", _partial_: True}
+            - {_target_: "jejeqx._src.transforms.spatial.validate_lat", _partial_: True}
+            - {_target_: "jejeqx._src.transforms.temporal.validate_time", _partial_: True}
+            # RESCALE TIME
+            - {_target_: "jejeqx._src.transforms.temporal.decode_cf_time", units: "seconds since 2012-10-01", _partial_: true}
+            - {_target_: "jejeqx._src.transforms.xarray.spatial.transform_360_to_180", _partial_: True}
+            # SELECT REGION
+            #- "${select}"
+            - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
+            
+# DUACS
+ALONGTRACK_NADIR5:
+    name: "ssh_obs"
+    experiment: "nadir5"
+    variable: "ssh_mod"
+    data:
+        _target_: "oceanbench._src.data.pipe"
+        inp: "/gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/staging/ml_ready/nadir5.nc"
+        fns:
+            - {_target_: "xarray.open_dataset", decode_times: True, _partial_: True}
+            # VALIDATE COORDINATES
+            - "${set_coords}"
+            - {_target_: "jejeqx._src.transforms.spatial.validate_lon", _partial_: True}
+            - {_target_: "jejeqx._src.transforms.spatial.validate_lat", _partial_: True}
+            - {_target_: "jejeqx._src.transforms.temporal.validate_time", _partial_: True}
+            # RESCALE TIME
+            - {_target_: "jejeqx._src.transforms.temporal.decode_cf_time", units: "seconds since 2012-10-01", _partial_: true}
+            - {_target_: "jejeqx._src.transforms.xarray.spatial.transform_360_to_180", _partial_: True}
+            # SELECT REGION
+            #- "${select}"
+            - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
+            
+# DUACS
+ALONGTRACK_SWOT1NADIR5:
+    name: "ssh_obs"
+    experiment: "nadir5"
+    variable: "ssh_mod"
+    data:
+        _target_: "oceanbench._src.data.pipe"
+        inp: "/gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/staging/ml_ready/swot1nadir5.nc"
+        fns:
+            - {_target_: "xarray.open_dataset", decode_times: True, _partial_: True}
+            # VALIDATE COORDINATES
+            - "${set_coords}"
+            - {_target_: "jejeqx._src.transforms.spatial.validate_lon", _partial_: True}
+            - {_target_: "jejeqx._src.transforms.spatial.validate_lat", _partial_: True}
+            - {_target_: "jejeqx._src.transforms.temporal.validate_time", _partial_: True}
+            # RESCALE TIME
+            - {_target_: "jejeqx._src.transforms.temporal.decode_cf_time", units: "seconds since 2012-10-01", _partial_: true}
+            - {_target_: "jejeqx._src.transforms.xarray.spatial.transform_360_to_180", _partial_: True}
+            # SELECT REGION
+            #- "${select}"
+            - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
+
 alongrack:
     _target_: jejeqx._src.datamodules.coords_v2.AlongTrackDM
     paths: "/gpfswork/rech/yrf/commun/data_challenges/dc20a_osse/staging/ml_ready/nadir4.nc"
