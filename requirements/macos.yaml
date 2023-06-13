@@ -66,6 +66,7 @@ dependencies:
       - diffrax
       - flax
       - ciclo
+      - "git+https://github.com/jejjohnson/eqx-nerf.git"
       # optimization
       - optax
       - jaxopt
