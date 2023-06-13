@@ -78,6 +78,7 @@ ALONGTRACK_SWOT:
             - {_target_: "jejeqx._src.transforms.xarray.spatial.transform_360_to_180", _partial_: True}
             # SELECT REGION
             #- "${select}"
+            - "${select_time}"
             - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
 
 # DUACS
@@ -100,6 +101,7 @@ ALONGTRACK_NADIR5:
             - {_target_: "jejeqx._src.transforms.xarray.spatial.transform_360_to_180", _partial_: True}
             # SELECT REGION
             #- "${select}"
+            - "${select_time}"
             - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
 
 # DUACS
@@ -123,6 +125,7 @@ ALONGTRACK_SWOT1NADIR5:
             # SELECT REGION
             #- "${select}"
             - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
+            - "${select_time}"
 
 alongrack:
     _target_: jejeqx._src.datamodules.coords_v2.AlongTrackDM

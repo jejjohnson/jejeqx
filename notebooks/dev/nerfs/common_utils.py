@@ -26,6 +26,10 @@ from jejeqx._src.viz.xarray.psd_score import (
 )
 from jejeqx._src.viz.utils import get_cbar_label
 
+def calculate_anomaly(ds, variable="ssh", dim=["lat", "lon"]):
+    ds[f"{variable}_anomaly"] = ds[variable] - ds[variable].mean(dim=dim)
+    return ds
+
 
 def calculate_physical_quantities(da: xr.DataArray) -> xr.Dataset:
 
