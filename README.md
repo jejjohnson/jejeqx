@@ -35,9 +35,29 @@ pip install "git+https://github.com/jejjohnson/jemanjjax.git"
 ```
 
 ---
-## Algorithms
+## External Packages
 
-**Neural Fields** (NerFs)
+I use quite a few of external packages that I've relegated to their own repo.
+
+**Neural Fields**
+
+```bash
+pip install "git+https://github.com/jejjohnson/eqx-nerf.git"
+```
+
+**Trainer**
+
+```bash
+pip install "git+https://github.com/jejjohnson/eqx-trainer.git"
+```
+
+
+**OceanBench**
+
+```bash
+brew install g++ cmake eigen boost gsl
+pip install "git+https://github.com/jejjohnson/oceanbench.git"
+```
 
 
 
