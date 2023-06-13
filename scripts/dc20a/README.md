@@ -78,7 +78,7 @@ python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/si
 
 
 ```python
-# MLP 
+# MLP
 python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/mlp/swot1nadir5/scratch -r ige/jax4eo/cnq231o4 -c ige/jax4eo/experiments-ckpts:v89
 # RANDOM FOURIER FEATURES | SCRATCH
 python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/ffn/swot1nadir5/scratch -r ige/jax4eo/52tqyi8h -c ige/jax4eo/experiments-ckpts:v101
@@ -99,7 +99,7 @@ python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/si
 **Train More**
 
 ```python
-# MLP 
+# MLP
 python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/mlp/swot1nadir5/scratch -r ige/jax4eo/cnq231o4 -c ige/jax4eo/experiments-ckpts:v89
 # RANDOM FOURIER FEATURES
 python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/ffn/swot1nadir5/pretrained -r ige/jax4eo/52tqyi8h -c ige/jax4eo/experiments-ckpts:v101
@@ -110,7 +110,7 @@ python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/si
 **PreTrained**
 
 ```python
-# MLP 
+# MLP
 python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/mlp/swot1nadir5/scratch -r ige/jax4eo/cnq231o4 -c ige/jax4eo/experiments-ckpts:v89
 # RANDOM FOURIER FEATURES
 python download_checkpoint.py -p /gpfswork/rech/cli/uvo53rl/checkpoints/nerfs/ffn/swot1nadir5/pretrained -r ige/jax4eo/52tqyi8h -c ige/jax4eo/experiments-ckpts:v101

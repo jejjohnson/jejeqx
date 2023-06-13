@@ -8,13 +8,13 @@ mlp:
         depth: 5
         activation:
             _target_: jejeqx._src.nets.activations.ReLU
-        final_activation: 
+        final_activation:
             _target_: equinox.nn.Identity
         key:
             _target_: jax.random.PRNGKey
             seed: 123
-            
-            
+
+
 ffn:
    _target_: jejeqx._src.nets.nerfs.base.SpatioTempNerF
    basis_net:
@@ -29,7 +29,7 @@ ffn:
         key:
             _target_: jax.random.PRNGKey
             seed: 123
-            
+
 siren:
    _target_: jejeqx._src.nets.nerfs.base.SpatioTempNerF
    basis_net:
@@ -41,4 +41,4 @@ siren:
         key:
             _target_: jax.random.PRNGKey
             seed: 123
-    
+

@@ -18,9 +18,8 @@ def select_bounds(ds: xrdata, bounds: Bounds) -> xrdata:
         ds (xrdata): the xarray dataset after the subset
     """
     return ds.where(
-        (ds[bounds.name] >= bounds.val_min)
-        & (ds[bounds.name] <= bounds.val_max),
-        drop=True
+        (ds[bounds.name] >= bounds.val_min) & (ds[bounds.name] <= bounds.val_max),
+        drop=True,
     )
 
 
@@ -41,7 +40,7 @@ def select_bounds_multiple(ds: xrdata, bounds: Iterable[Bounds]) -> xrdata:
     #     d_sub = select_bounds(d_sub, ibnd)
 
     bounds = [ds] + bounds
-    
+
     return reduce((lambda ds, ibounds: select_bounds(ds, ibounds)), bounds)
 
 
@@ -67,7 +66,7 @@ def select_region(ds: xr.Dataset, region: Region) -> xr.Dataset:
 
 
 def select_preiod(ds: xr.Dataset, period: Period) -> xr.Dataset:
-    """This is syntactic sugar to select a time period from an 
+    """This is syntactic sugar to select a time period from an
     xr.Dataset
 
     Args:
@@ -78,8 +77,7 @@ def select_preiod(ds: xr.Dataset, period: Period) -> xr.Dataset:
         ds (xr.Dataset): the new xarray dataset
     """
     ds = ds.where(
-        (ds["time"] >= period.t_min)
-        & (ds["time"] <= period.t_max),
+        (ds["time"] >= period.t_min) & (ds["time"] <= period.t_max),
         drop=True,
     )
 

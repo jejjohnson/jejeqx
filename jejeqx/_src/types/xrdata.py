@@ -1,6 +1,16 @@
 from typing import Literal
 from dataclasses import dataclass
-from xarray_dataclasses import Coordof, Dataof, Attr, Coord, Data, Name, AsDataArray, AsDataset, Dataof
+from xarray_dataclasses import (
+    Coordof,
+    Dataof,
+    Attr,
+    Coord,
+    Data,
+    Name,
+    AsDataArray,
+    AsDataset,
+    Dataof,
+)
 import numpy as np
 import pandas as pd
 
@@ -38,15 +48,15 @@ class Period:
     dt_freq: int
     dt_unit: str
     name: str = ""
-    
+
     @property
     def t_min_dt(self):
         return pd.to_datetime(self.t_min)
-    
+
     @property
     def t_max_dt(self):
         return pd.to_datetime(self.t_max)
-    
+
     @property
     def dt(self):
         return pd.to_timedelta(self.dt_freq, self.dt_unit)
@@ -60,11 +70,11 @@ class CoordinateAxis:
     def init_from_limits(cls, x_min: float, x_max: float, dx: float, **kwargs):
         data = np.arange(x_min, x_max, dx)
         return cls(data=data, **kwargs)
-    
+
     @property
     def ndim(self):
         return len(self.data)
-    
+
 
 class XAxis(CoordinateAxis):
     data: Data[X, np.float32]
@@ -143,12 +153,12 @@ class Grid2D(AsDataArray):
     @property
     def ndim(self):
         return (self.lat.ndim, self.lon.ndim)
-    
+
     @property
     def spatial_grid(self):
         grid = np.meshgrid(self.lat.data, self.lon.data, indexing="ij")
         return np.stack(grid, axis=-1)
-    
+
 
 @dataclass
 class Grid2DT(AsDataArray):
@@ -161,7 +171,6 @@ class Grid2DT(AsDataArray):
     @property
     def ndim(self):
         return (self.time.ndim, self.lat.ndim, self.lon.ndim)
-        
 
 
 @dataclass
@@ -182,7 +191,7 @@ class SSH2D:
     def init_from_axis(cls, lon: LongitudeAxis, lat: LatitudeAxis):
         data_init = np.ones((lat.ndim, lon.ndim))
         return cls(data=data_init, lon=lon, lat=lat)
-    
+
     @classmethod
     def init_from_grid(cls, grid: Grid2D):
         return cls(data=np.ones(grid.ndim), lon=grid.lon, lat=grid.lat)
@@ -206,11 +215,9 @@ class SSH2DT:
     @classmethod
     def init_from_axis(cls, lon: LongitudeAxis, lat: LatitudeAxis, time: TimeAxis):
         return cls(
-            data=np.ones((time.ndim, lat.ndim, lon.ndim)),
-            time=time, lon=lon, lat=lat)
-    
+            data=np.ones((time.ndim, lat.ndim, lon.ndim)), time=time, lon=lon, lat=lat
+        )
+
     @classmethod
     def init_from_grid(cls, grid: Grid2DT):
-        return cls(
-            data=np.ones(grid.ndim),
-            lon=grid.lon, lat=grid.lat, time=grid.time)
+        return cls(data=np.ones(grid.ndim), lon=grid.lon, lat=grid.lat, time=grid.time)

@@ -17,4 +17,4 @@ python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     ++optimizer.learning_rate=1e-4 \
     ++data.train_size=0.90 \
     ++model.basis_net.ard=False \
-    dataset="natl60" 
+    dataset="natl60"

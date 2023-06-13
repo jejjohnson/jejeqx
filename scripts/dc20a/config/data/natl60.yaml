@@ -8,5 +8,5 @@ temporal_coords: ["time"]
 variables: ["sossheig"]
 evaluation: False
 resample: "12h"
-select: 
+select:
     time: {_target_: builtins.slice, _args_: ["2012-01-01", "2013-10-01"]}

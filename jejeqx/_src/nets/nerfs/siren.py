@@ -68,7 +68,7 @@ class Siren(eqx.Module):
         is_first: bool = False,
         w0: float = 1.0,
         c: float = 6.0,
-        activation: Optional[eqx.Module]=None,
+        activation: Optional[eqx.Module] = None,
         *,
         key: PRNGKey,
     ):
@@ -118,23 +118,20 @@ class Siren(eqx.Module):
             x = jnp.squeeze(x)
         return self.activation(x)
 
+
 class ModulatedSiren(Siren):
-    
     def __call__(
-        self, 
-        x: Array, 
-        mod: Optional[Array]=None, *, 
-        key: Optional[PRNGKey] = None
+        self, x: Array, mod: Optional[Array] = None, *, key: Optional[PRNGKey] = None
     ) -> Array:
         if self.in_features == "scalar":
             if jnp.shape(x) != ():
                 raise ValueError("x must have scalar shape")
             x = jnp.broadcast_to(x, (1,))
         x = self.weight @ x
-        
+
         if self.bias is not None:
             x = x + self.bias
-            
+
         # print("xw+b:", x.shape)
         if self.out_features == "scalar":
             assert jnp.shape(x) == (1,)
@@ -142,7 +139,7 @@ class ModulatedSiren(Siren):
         if mod is not None:
             x += mod
         return self.activation(x)
-    
+
 
 class LatentModulatedSiren(eqx.Module):
     """Performs a linear transformation.
@@ -176,8 +173,8 @@ class LatentModulatedSiren(eqx.Module):
         latent_depth: int = 1,
         w0: float = 1.0,
         c: float = 6.0,
-        activation: Optional[eqx.Module]=None,
-        latent_activation: Optional[eqx.Module]=ReLU(), 
+        activation: Optional[eqx.Module] = None,
+        latent_activation: Optional[eqx.Module] = ReLU(),
         *,
         key: PRNGKey,
     ):
@@ -213,11 +210,13 @@ class LatentModulatedSiren(eqx.Module):
         self.c = c
         self.is_first = is_first
         self.modulation = eqx.nn.MLP(
-            in_size=latent_dim, out_size=out_features_,
-            depth=latent_depth, width_size=latent_width,
-            activation = ReLU() if latent_activation is None else latent_activation,
+            in_size=latent_dim,
+            out_size=out_features_,
+            depth=latent_depth,
+            width_size=latent_width,
+            activation=ReLU() if latent_activation is None else latent_activation,
             final_activation=Identity(),
-            key=mkey
+            key=mkey,
         )
         self.activation = Sine(self.w0) if activation is None else activation
 
@@ -232,10 +231,11 @@ class LatentModulatedSiren(eqx.Module):
         if self.out_features == "scalar":
             assert jnp.shape(x) == (1,)
             x = jnp.squeeze(x)
-        
+
         x += self.modulation(z)
-        
+
         return self.activation(x)
+
 
 class SirenNet(eqx.Module):
     """Standard Multi-Layer Perceptron; also known as a feed-forward network.
@@ -290,22 +290,32 @@ class SirenNet(eqx.Module):
         keys = jrandom.split(key, depth)
         layers = []
         if depth == 0:
-            layers.append(Siren(in_size, out_features, w0=w0_initial, c=c, is_first=True, key=keys[0]))
+            layers.append(
+                Siren(
+                    in_size,
+                    out_features,
+                    w0=w0_initial,
+                    c=c,
+                    is_first=True,
+                    key=keys[0],
+                )
+            )
         else:
-            layers.append(Siren(in_size, width_size, w0=w0_initial, c=c, is_first=True, key=keys[0]))
+            layers.append(
+                Siren(
+                    in_size, width_size, w0=w0_initial, c=c, is_first=True, key=keys[0]
+                )
+            )
             for i in range(depth - 2):
                 layers.append(
                     Siren(width_size, width_size, w0=w0, c=c, key=keys[i + 1])
                 )
-            layers.append(
-                Siren(width_size, out_size, w0=w0, c=c, key=keys[-1])
-            )
+            layers.append(Siren(width_size, out_size, w0=w0, c=c, key=keys[-1]))
         self.layers = tuple(layers)
         self.in_size = in_size
         self.out_size = out_size
         self.width_size = width_size
         self.depth = depth
-
 
     def __call__(self, x: Array, *, key: Optional[PRNGKey] = None) -> Array:
         """**Arguments:**
@@ -320,8 +330,7 @@ class SirenNet(eqx.Module):
             x = layer(x)
         return x
 
-    
-    
+
 class ModulatedSirenNet(eqx.Module):
     """Standard Multi-Layer Perceptron; also known as a feed-forward network.
 
@@ -371,30 +380,51 @@ class ModulatedSirenNet(eqx.Module):
         output from the module will have shape `()`.
         """
         super().__init__(**kwargs)
-        keys = jrandom.split(key, depth+1)
+        keys = jrandom.split(key, depth + 1)
         layers = []
         mod_layers = []
         if depth == 0:
-            layers.append(ModulatedSiren(
-                in_features=in_size, out_features=out_size,
-                w0=w0_initial, c=c, is_first=True, key=keys[0])
-                         )
+            layers.append(
+                ModulatedSiren(
+                    in_features=in_size,
+                    out_features=out_size,
+                    w0=w0_initial,
+                    c=c,
+                    is_first=True,
+                    key=keys[0],
+                )
+            )
         else:
-            layers.append(ModulatedSiren(
-                in_features=in_size, out_features=width_size, 
-                w0=w0_initial, c=c, is_first=True, key=keys[0])
-                         )
+            layers.append(
+                ModulatedSiren(
+                    in_features=in_size,
+                    out_features=width_size,
+                    w0=w0_initial,
+                    c=c,
+                    is_first=True,
+                    key=keys[0],
+                )
+            )
             for i in range(1, depth):
                 layers.append(
                     ModulatedSiren(
-                        in_features=width_size, out_features=width_size, 
-                        w0=w0, c=c, is_first=False, key=keys[i + 1]
+                        in_features=width_size,
+                        out_features=width_size,
+                        w0=w0,
+                        c=c,
+                        is_first=False,
+                        key=keys[i + 1],
                     )
                 )
             layers.append(
                 ModulatedSiren(
-                    in_features=width_size, out_features=out_size,
-                    w0=w0, c=c, is_first=False, key=keys[-1])
+                    in_features=width_size,
+                    out_features=out_size,
+                    w0=w0,
+                    c=c,
+                    is_first=False,
+                    key=keys[-1],
+                )
             )
         self.layers = tuple(layers)
         self.in_size = in_size
@@ -402,7 +432,6 @@ class ModulatedSirenNet(eqx.Module):
         self.width_size = width_size
         self.depth = depth
         self.latent_dim = latent_dim
-
 
     def __call__(self, x: Array, z: Array, *, key: Optional[PRNGKey] = None) -> Array:
         """**Arguments:**
@@ -416,9 +445,10 @@ class ModulatedSirenNet(eqx.Module):
         assert z.shape == (self.latent_dim,)
         for layer in self.layers:
             x = layer(x, z)
-            
+
         return x
-    
+
+
 class LatentModulatedSirenNet(eqx.Module):
     """Standard Multi-Layer Perceptron; also known as a feed-forward network.
 
@@ -440,8 +470,8 @@ class LatentModulatedSirenNet(eqx.Module):
         width_size: int,
         depth: int,
         latent_dim: int,
-        latent_width: int=64,
-        latent_depth: int=1,
+        latent_width: int = 64,
+        latent_depth: int = 1,
         w0_initial: float = 30.0,
         w0: float = 1.0,
         c: float = 6.0,
@@ -472,39 +502,67 @@ class LatentModulatedSirenNet(eqx.Module):
         output from the module will have shape `()`.
         """
         super().__init__(**kwargs)
-        keys = jrandom.split(key, depth+1)
+        keys = jrandom.split(key, depth + 1)
         layers = []
         mod_layers = []
         if depth == 0:
-            layers.append(LatentModulatedSiren(
-                in_features=in_size, out_features=out_size,
-                w0=w0_initial, c=c, is_first=True, 
-                latent_dim=latent_dim, latent_width=latent_width, latent_depth=latent_depth,
-                latent_activation=latent_activation, key=keys[0])
-                         )
+            layers.append(
+                LatentModulatedSiren(
+                    in_features=in_size,
+                    out_features=out_size,
+                    w0=w0_initial,
+                    c=c,
+                    is_first=True,
+                    latent_dim=latent_dim,
+                    latent_width=latent_width,
+                    latent_depth=latent_depth,
+                    latent_activation=latent_activation,
+                    key=keys[0],
+                )
+            )
         else:
-            layers.append(LatentModulatedSiren(
-                in_features=in_size, out_features=width_size, 
-                w0=w0_initial, c=c, is_first=True,
-                latent_dim=latent_dim, latent_width=latent_width, latent_depth=latent_depth,
-                latent_activation=latent_activation, key=keys[0])
-                         )
+            layers.append(
+                LatentModulatedSiren(
+                    in_features=in_size,
+                    out_features=width_size,
+                    w0=w0_initial,
+                    c=c,
+                    is_first=True,
+                    latent_dim=latent_dim,
+                    latent_width=latent_width,
+                    latent_depth=latent_depth,
+                    latent_activation=latent_activation,
+                    key=keys[0],
+                )
+            )
             for i in range(1, depth):
                 layers.append(
                     LatentModulatedSiren(
-                        in_features=width_size, out_features=width_size, 
-                        w0=w0, c=c, is_first=False,
-                        latent_dim=latent_dim, latent_width=latent_width, latent_depth=latent_depth,
-                        latent_activation=latent_activation, key=keys[i]
+                        in_features=width_size,
+                        out_features=width_size,
+                        w0=w0,
+                        c=c,
+                        is_first=False,
+                        latent_dim=latent_dim,
+                        latent_width=latent_width,
+                        latent_depth=latent_depth,
+                        latent_activation=latent_activation,
+                        key=keys[i],
                     )
                 )
-                
+
             layers.append(
                 LatentModulatedSiren(
-                    in_features=width_size, out_features=out_size,
-                    w0=w0, c=c, is_first=False,
-                    latent_dim=latent_dim, latent_width=latent_width, latent_depth=latent_depth,
-                    latent_activation=latent_activation, key=keys[-1]
+                    in_features=width_size,
+                    out_features=out_size,
+                    w0=w0,
+                    c=c,
+                    is_first=False,
+                    latent_dim=latent_dim,
+                    latent_width=latent_width,
+                    latent_depth=latent_depth,
+                    latent_activation=latent_activation,
+                    key=keys[-1],
                 )
             )
         self.layers = tuple(layers)
@@ -513,7 +571,6 @@ class LatentModulatedSirenNet(eqx.Module):
         self.width_size = width_size
         self.depth = depth
         self.latent_dim = latent_dim
-
 
     def __call__(self, x: Array, z: Array, *, key: Optional[PRNGKey] = None) -> Array:
         """**Arguments:**
@@ -526,5 +583,5 @@ class LatentModulatedSirenNet(eqx.Module):
         """
         for layer in self.layers:
             x = layer(x, z)
-            
+
         return x

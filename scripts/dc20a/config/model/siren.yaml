@@ -17,5 +17,3 @@ network:
     key:
         _target_: jax.random.PRNGKey
         seed: 42
-
-

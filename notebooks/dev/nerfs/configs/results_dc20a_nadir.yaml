@@ -10,8 +10,8 @@ select:
     _target_: "xarray.Dataset.sel"
     _partial_: True
     indexers: "${domain}"
-    
-    
+
+
 # DUACS
 DUACS_NADIR:
     name: "duacs"
@@ -33,7 +33,7 @@ DUACS_NADIR:
             # SELECT REGION
             - "${select}"
             - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
-            
+
 # MIOST - nadir4
 MIOST_NADIR:
     name: "miost"
@@ -55,7 +55,7 @@ MIOST_NADIR:
             # SELECT REGION
             - "${select}"
             - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
-            
+
 # NERF - SIREN - nadir4
 NERF_SIREN_NADIR:
     name: "nerf_siren"
@@ -76,7 +76,7 @@ NERF_SIREN_NADIR:
             # SELECT REGION
             - "${select}"
             - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
-            
+
 # NERF - FFN - nadir4
 NERF_FFN_NADIR:
     name: "nerf_ffn"
@@ -97,7 +97,7 @@ NERF_FFN_NADIR:
             # SELECT REGION
             - "${select}"
             - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
-            
+
 # NERF - MLP - nadir4
 NERF_MLP_NADIR:
     name: "nerf_mlp"

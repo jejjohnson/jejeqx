@@ -6,7 +6,7 @@ steps_config:
         _target_: jejeqx._src.transforms.dataframe.spatial.Spherical2Cartesian
         radius: 1.0
         units: "degrees"
-        
+
     - spatialminmax:
         _target_: jejeqx._src.transforms.dataframe.scaling.MinMaxDF
         columns: ['x', 'y', 'z']

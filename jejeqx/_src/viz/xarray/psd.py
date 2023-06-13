@@ -7,158 +7,164 @@ from jejeqx._src.metrics.score import find_intercept_1D, find_intercept_2D
 
 
 class PlotPSDIsotropic:
-        
     def init_fig(self, ax=None, figsize=None):
         if ax is None:
-            figsize = (5,4) if figsize is None else figsize
+            figsize = (5, 4) if figsize is None else figsize
             self.fig, self.ax = plt.subplots(figsize=figsize)
         else:
             self.ax = ax
             self.fig = plt.gcf()
-        
-    def plot_wavenumber(self, da,freq_scale=1.0, units=None, **kwargs):
-        
+
+    def plot_wavenumber(self, da, freq_scale=1.0, units=None, **kwargs):
+
         if units is not None:
             xlabel = f"Wavenumber [cycles/{units}]"
         else:
             xlabel = f"Wavenumber"
-            
+
         dim = list(da.dims)[0]
-        
+
         self.ax.plot(da[dim] * freq_scale, da, **kwargs)
 
         self.ax.set(
-            yscale="log", xscale="log",
+            yscale="log",
+            xscale="log",
             xlabel=xlabel,
             ylabel=f"PSD [{da.name}]",
-            xlim=[10**(-3) - 0.00025, 10**(-1) +0.025]
+            xlim=[10 ** (-3) - 0.00025, 10 ** (-1) + 0.025],
         )
 
         self.ax.legend()
         self.ax.grid(which="both", alpha=0.5)
-        
+
     def plot_wavelength(self, da, freq_scale=1.0, units=None, **kwargs):
-        
+
         if units is not None:
             xlabel = f"Wavelength [{units}]"
         else:
             xlabel = f"Wavelength"
-        
-        self.ax.plot(1/(da[dim] * freq_scale), da, **kwargs)
-        
+
+        self.ax.plot(1 / (da[dim] * freq_scale), da, **kwargs)
+
         self.ax.set(
-            yscale="log", xscale="log",
-            xlabel=xlabel,
-            ylabel=f"PSD [{da.name}]"
+            yscale="log", xscale="log", xlabel=xlabel, ylabel=f"PSD [{da.name}]"
         )
 
         self.ax.xaxis.set_major_formatter("{x:.0f}")
         self.ax.invert_xaxis()
-        
+
         self.ax.legend()
         self.ax.grid(which="both", alpha=0.5)
-                
+
     def plot_both(self, da, freq_scale=1.0, units=None, **kwargs):
-        
+
         if units is not None:
             xlabel = f"Wavelength [{units}]"
         else:
             xlabel = f"Wavelength"
-        
+
         self.plot_wavenumber(da=da, units=units, freq_scale=freq_scale, **kwargs)
-        
+
         self.secax = self.ax.secondary_xaxis(
             "top", functions=(lambda x: 1 / (x + 1e-20), lambda x: 1 / (x + 1e-20))
         )
         self.secax.xaxis.set_major_formatter("{x:.0f}")
         self.secax.set(xlabel=xlabel)
-        
+
 
 class PlotPSDScoreIsotropic(PlotPSDIsotropic):
-    
     def _add_score(
         self,
         da,
-        freq_scale=1.0, 
-        units=None, 
-        threshhold: float=0.5, 
+        freq_scale=1.0,
+        units=None,
+        threshhold: float = 0.5,
         threshhold_color="k",
-        name=""
-):
-        
+        name="",
+    ):
+
         dim = da.dims[0]
         self.ax.set(ylabel="PSD Score", yscale="linear")
-        self.ax.set_ylim((0,1.0))
-        self.ax.set_xlim((
-            10**(-3) - 0.00025,
-            10**(-1) +0.025,
-        ))
-        
+        self.ax.set_ylim((0, 1.0))
+        self.ax.set_xlim(
+            (
+                10 ** (-3) - 0.00025,
+                10 ** (-1) + 0.025,
+            )
+        )
+
         resolved_scale = freq_scale / find_intercept_1D(
-            x=da.values, y=1./da[dim].values, level=threshhold
-        )        
+            x=da.values, y=1.0 / da[dim].values, level=threshhold
+        )
         self.ax.vlines(
-            x=resolved_scale, 
-            ymin=0, ymax=threshhold, 
+            x=resolved_scale,
+            ymin=0,
+            ymax=threshhold,
             color=threshhold_color,
-            linewidth=2, linestyle="--",
+            linewidth=2,
+            linestyle="--",
         )
         self.ax.hlines(
             y=threshhold,
-            xmin=10**(-3) - 0.00025,
-            #xmin=np.ma.min(np.ma.masked_invalid(da[dim].values * freq_scale)),
-            xmax=resolved_scale, color=threshhold_color,
-            linewidth=2, linestyle="--"
-        )        
+            xmin=10 ** (-3) - 0.00025,
+            # xmin=np.ma.min(np.ma.masked_invalid(da[dim].values * freq_scale)),
+            xmax=resolved_scale,
+            color=threshhold_color,
+            linewidth=2,
+            linestyle="--",
+        )
         label = f"{name}: {1/resolved_scale:.0f} {units} "
         self.ax.scatter(
-            resolved_scale, threshhold,
-            color=threshhold_color, marker=".",
-            linewidth=5, label=label,
-            zorder=3
+            resolved_scale,
+            threshhold,
+            color=threshhold_color,
+            marker=".",
+            linewidth=5,
+            label=label,
+            zorder=3,
         )
-        
-        
+
     def plot_score(
-        self, 
-        da, 
-        freq_scale=1.0, 
-        units=None, 
-        threshhold: float=0.5, 
+        self,
+        da,
+        freq_scale=1.0,
+        units=None,
+        threshhold: float = 0.5,
         threshhold_color="k",
         name="",
-        **kwargs
+        **kwargs,
     ):
-        
+
         self.plot_both(da=da, freq_scale=freq_scale, units=units, **kwargs)
         self._add_score(
-            da=da, 
+            da=da,
             freq_scale=freq_scale,
             units=units,
-            threshhold=threshhold, 
+            threshhold=threshhold,
             threshhold_color=threshhold_color,
-            name=name
+            name=name,
         )
-        
-        
+
+
 class PlotPSDSpaceTime:
     def init_fig(self, ax=None, figsize=None):
         if ax is None:
-            figsize = (5,4) if figsize is None else figsize
+            figsize = (5, 4) if figsize is None else figsize
             self.fig, self.ax = plt.subplots(figsize=figsize)
         else:
             self.ax = ax
             self.fig = plt.gcf()
-        
+
     def plot_wavenumber(
-        self, 
-        da, 
-        space_scale: float=1.0,
-        space_units: str=None,
-        time_units: str=None,
-        psd_units: float=None,
-        **kwargs):
-        
+        self,
+        da,
+        space_scale: float = 1.0,
+        space_units: str = None,
+        time_units: str = None,
+        psd_units: float = None,
+        **kwargs,
+    ):
+
         if space_units is not None:
             xlabel = f"Wavenumber [cycles/{space_units}]"
         else:
@@ -172,19 +178,19 @@ class PlotPSDSpaceTime:
             cbar_label = "PSD"
         else:
             cbar_label = f"PSD [{psd_units}]"
-        
+
         locator = ticker.LogLocator()
         norm = colors.LogNorm()
-        
+
         pts = self.ax.contourf(
-            1/(da.freq_lon*space_scale),
-            1/da.freq_time, 
-            da.transpose("freq_time", "freq_lon"), 
-            norm=norm, 
-            locator=locator, 
-            cmap=kwargs.pop("cmap", "RdYlGn"), 
+            1 / (da.freq_lon * space_scale),
+            1 / da.freq_time,
+            da.transpose("freq_time", "freq_lon"),
+            norm=norm,
+            locator=locator,
+            cmap=kwargs.pop("cmap", "RdYlGn"),
             extend=kwargs.pop("extend", "both"),
-            **kwargs
+            **kwargs,
         )
 
         self.ax.set(
@@ -192,7 +198,6 @@ class PlotPSDSpaceTime:
             xscale="log",
             xlabel=xlabel,
             ylabel=ylabel,
-            
         )
         # colorbar
         fmt = ticker.LogFormatterMathtext(base=10)
@@ -205,67 +210,71 @@ class PlotPSDSpaceTime:
         cbar.ax.set_ylabel(cbar_label)
         self.ax.invert_xaxis()
         self.ax.invert_yaxis()
-        self.ax.grid(which="both", linestyle="--", linewidth=1, color="black", alpha=0.2)
+        self.ax.grid(
+            which="both", linestyle="--", linewidth=1, color="black", alpha=0.2
+        )
 
-
-    def plot_wavelength(        
-        self, 
-        da, 
-        space_scale: float=1.0,
-        space_units: str=None,
-        time_units: str=None,
-        psd_units: float=None,
-        **kwargs
+    def plot_wavelength(
+        self,
+        da,
+        space_scale: float = 1.0,
+        space_units: str = None,
+        time_units: str = None,
+        psd_units: float = None,
+        **kwargs,
     ):
-    
+
         if space_units is not None:
             xlabel = f"Wavelength [{space_units}]"
         else:
             xlabel = f"Wavelength"
-            
+
         if time_units is not None:
             ylabel = f"Period [{time_units}]"
         else:
             ylabel = f"Period"
-            
+
         if psd_units is None:
             cbar_label = "PSD"
         else:
             cbar_label = f"PSD [{psd_units}]"
-            
+
         self.plot_wavenumber(
-            da=da, space_scale=space_scale, 
-            space_units=space_units, time_units=time_units,
-            psd_units=psd_units
+            da=da,
+            space_scale=space_scale,
+            space_units=space_units,
+            time_units=time_units,
+            psd_units=psd_units,
         )
 
         self.ax.set(
-            xlabel=xlabel, 
+            xlabel=xlabel,
             ylabel=ylabel,
         )
         self.ax.xaxis.set_major_formatter("{x:.0f}")
         self.ax.yaxis.set_major_formatter("{x:.0f}")
-        
-        
+
+
 class PlotPSDSpaceTimeScore:
     def init_fig(self, ax=None, figsize=None):
         if ax is None:
-            figsize = (5,4) if figsize is None else figsize
+            figsize = (5, 4) if figsize is None else figsize
             self.fig, self.ax = plt.subplots(figsize=figsize)
         else:
             self.ax = ax
             self.fig = plt.gcf()
-        
+
     def plot_wavenumber(
-        self, 
-        da, 
-        space_scale: float=1.0,
-        space_units: str=None,
-        time_units: str=None,
-        psd_units: float=None,
-        threshhold: float=0.5,
-        **kwargs):
-        
+        self,
+        da,
+        space_scale: float = 1.0,
+        space_units: str = None,
+        time_units: str = None,
+        psd_units: float = None,
+        threshhold: float = 0.5,
+        **kwargs,
+    ):
+
         if space_units is not None:
             xlabel = f"Wavenumber [cycles/{space_units}]"
         else:
@@ -279,16 +288,15 @@ class PlotPSDSpaceTimeScore:
             cbar_label = "PSD Score"
         else:
             cbar_label = f"PSD Score [{psd_units}]"
-        
-        
+
         pts = self.ax.contourf(
-            1/(da.freq_lon*space_scale),
-            1/da.freq_time, 
-            da.transpose("freq_time", "freq_lon"), 
-            cmap=kwargs.pop("cmap", "RdBu"), 
+            1 / (da.freq_lon * space_scale),
+            1 / da.freq_time,
+            da.transpose("freq_time", "freq_lon"),
+            cmap=kwargs.pop("cmap", "RdBu"),
             extend=kwargs.pop("extend", "both"),
             levels=np.arange(0, 1.1, 0.1),
-            **kwargs
+            **kwargs,
         )
 
         self.ax.set(
@@ -305,73 +313,75 @@ class PlotPSDSpaceTimeScore:
         )
         self.cbar.ax.set_ylabel(cbar_label)
 
-        self.ax.grid(which="both", linestyle="--", linewidth=1, color="black", alpha=0.2)
-        
+        self.ax.grid(
+            which="both", linestyle="--", linewidth=1, color="black", alpha=0.2
+        )
+
         pts_middle = self.ax.contour(
-            1/(da.freq_lon * space_scale),
-            1/da.freq_time,
+            1 / (da.freq_lon * space_scale),
+            1 / da.freq_time,
             da.transpose("freq_time", "freq_lon"),
             levels=[threshhold],
             linewidths=2,
             colors="k",
         )
-        
+
         self.cbar.add_lines(pts_middle)
-        
+
         self.ax.invert_xaxis()
         self.ax.invert_yaxis()
 
-
-    def plot_wavelength(        
-        self, 
-        da, 
-        space_scale: float=1.0,
-        space_units: str=None,
-        time_units: str=None,
-        psd_units: float=None,
-        threshhold: float=0.5,
-        **kwargs
+    def plot_wavelength(
+        self,
+        da,
+        space_scale: float = 1.0,
+        space_units: str = None,
+        time_units: str = None,
+        psd_units: float = None,
+        threshhold: float = 0.5,
+        **kwargs,
     ):
-    
+
         if space_units is not None:
             xlabel = f"Wavelength [{space_units}]"
         else:
             xlabel = f"Wavelength"
-            
+
         if time_units is not None:
             ylabel = f"Period Score [{time_units}]"
         else:
             ylabel = f"Period Score"
-            
+
         if psd_units is None:
             cbar_label = "PSD"
         else:
             cbar_label = f"PSD [{psd_units}]"
 
         self.plot_wavenumber(
-            da=da, space_scale=space_scale, 
-            space_units=space_units, time_units=time_units,
-            psd_units=psd_units, threshhold=threshhold
+            da=da,
+            space_scale=space_scale,
+            space_units=space_units,
+            time_units=time_units,
+            psd_units=psd_units,
+            threshhold=threshhold,
         )
 
-        self.ax.set(
-            xlabel=xlabel, 
-            ylabel=ylabel
-        )
+        self.ax.set(xlabel=xlabel, ylabel=ylabel)
         self.ax.xaxis.set_major_formatter("{x:.0f}")
         self.ax.yaxis.set_major_formatter("{x:.0f}")
 
 
 def plot_psd_isotropic_wavenumber(
-    da: xr.DataArray, scale: str="km", units: str=None, ax=None, **kwargs):
-    
+    da: xr.DataArray, scale: str = "km", units: str = None, ax=None, **kwargs
+):
+
     if scale == "km":
         scale = 1e3
-        xlabel="Wavenumber [cycles/km]"
+        xlabel = "Wavenumber [cycles/km]"
     else:
         scale = 1.0
-        xlabel="Wavenumber [cycles/m]"
-        
+        xlabel = "Wavenumber [cycles/m]"
+
     if units is None:
         ylabel = "PSD"
     else:
@@ -399,26 +409,21 @@ def plot_psd_isotropic_wavenumber(
 
 
 def plot_psd_isotropic_wavelength(
-    da: xr.DataArray, scale: str="km", units: str=None, ax=None, **kwargs
+    da: xr.DataArray, scale: str = "km", units: str = None, ax=None, **kwargs
 ):
-    
-    
+
     if scale == "km":
-        xlabel="Wavenumber [km]"
+        xlabel = "Wavenumber [km]"
     else:
-        xlabel="Wavenumber [m]"
-        
+        xlabel = "Wavenumber [m]"
+
     if units is None:
         ylabel = "PSD"
     else:
         ylabel = f"PSD [{units}]"
 
     fig, ax = plot_psd_isotropic_wavenumber(
-        da, 
-        ax=ax, 
-        scale=scale, 
-        units=units,
-        **kwargs
+        da, ax=ax, scale=scale, units=units, **kwargs
     )
 
     ax.set(
@@ -435,13 +440,13 @@ def plot_psd_isotropic_wavelength(
 
 
 def plot_psd_isotropic(
-    da: xr.DataArray, scale: str="km", units: str=None, ax=None, **kwargs
+    da: xr.DataArray, scale: str = "km", units: str = None, ax=None, **kwargs
 ):
-    
+
     if scale == "km":
-        xlabel="Wavenumber [km]"
+        xlabel = "Wavenumber [km]"
     else:
-        xlabel="Wavenumber [m]"
+        xlabel = "Wavenumber [m]"
 
     fig, ax = plot_psd_isotropic_wavenumber(
         da=da, ax=ax, scale=scale, units=units, **kwargs
@@ -457,12 +462,9 @@ def plot_psd_isotropic(
 
 
 def plot_psd_spacetime_wavenumber(
-    da: xr.DataArray, 
-    space_scale: str=None,
-    psd_units: str=None,
-    ax=None
+    da: xr.DataArray, space_scale: str = None, psd_units: str = None, ax=None
 ):
-    
+
     if space_scale == "km":
         space_scale = 1e3
         xlabel = "Wavenumber [cycles/km]"
@@ -474,12 +476,12 @@ def plot_psd_spacetime_wavenumber(
         xlabel = "Wavenumber [k]"
     else:
         raise ValueError(f"Unrecognized scale: {space_scale}")
-        
+
     if psd_units is None:
         cbar_label = "PSD"
     else:
         cbar_label = f"PSD [{psd_units}]"
-    
+
     if ax is None:
         fig, ax = plt.subplots()
     else:
@@ -487,16 +489,15 @@ def plot_psd_spacetime_wavenumber(
 
     locator = ticker.LogLocator()
     norm = colors.LogNorm()
-    
 
     pts = ax.contourf(
-        1/(da.freq_lon*space_scale),
-        1/da.freq_time, 
-        da.transpose("freq_time", "freq_lon"), 
-        norm=norm, 
-        locator=locator, 
-        cmap="RdYlGn", 
-        extend="both"
+        1 / (da.freq_lon * space_scale),
+        1 / da.freq_time,
+        da.transpose("freq_time", "freq_lon"),
+        norm=norm,
+        locator=locator,
+        cmap="RdYlGn",
+        extend="both",
     )
 
     ax.set(
@@ -514,14 +515,14 @@ def plot_psd_spacetime_wavenumber(
         format=fmt,
     )
     cbar.ax.set_ylabel(cbar_label)
-    
+
     ax.grid(which="both", linestyle="--", linewidth=1, color="black", alpha=0.2)
 
     return fig, ax, cbar
 
 
 def plot_psd_spacetime_wavelength(da, space_scale="km", psd_units=None, ax=None):
-    
+
     if space_scale == "km":
         xlabel = "Wavelength [km]"
     elif space_scale == "m":
@@ -530,9 +531,10 @@ def plot_psd_spacetime_wavelength(da, space_scale="km", psd_units=None, ax=None)
         xlabel = "Wavelength k"
     else:
         raise ValueError(f"Unrecognized scale: {space_scale}")
-        
+
     fig, ax, cbar = plot_psd_spacetime_wavenumber(
-        da, space_scale=space_scale, psd_units=psd_units, ax=ax)
+        da, space_scale=space_scale, psd_units=psd_units, ax=ax
+    )
     ax.set(yscale="log", xscale="log", xlabel=xlabel, ylabel="Period [days]")
     ax.invert_xaxis()
     ax.invert_yaxis()

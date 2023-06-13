@@ -62,7 +62,7 @@ python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
 #     ++model.basis_net.ard=False \
 #     dataset="nadir4"
 
-    
+
 # ===============================================
 # MLP
 # ===============================================

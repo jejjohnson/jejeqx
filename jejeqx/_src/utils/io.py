@@ -1,6 +1,7 @@
 import subprocess
 
-def runcmd(cmd: str, verbose: bool=False, *args, **kwargs):
+
+def runcmd(cmd: str, verbose: bool = False, *args, **kwargs):
     """_summary_
     Args:
         cmd str: the command

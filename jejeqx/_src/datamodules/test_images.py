@@ -13,4 +13,3 @@ def test_fox_shapes():
 
     assert ds_test.tensors[0].shape[1] == 2
     assert ds_test.tensors[1].shape[1] == 3
-

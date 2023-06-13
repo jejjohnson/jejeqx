@@ -2,7 +2,7 @@
 
 
 # ===============================================
-# SIREN 
+# SIREN
 # ===============================================
 
 # CONFIG I - FROM SCRATCH
@@ -23,7 +23,7 @@ python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     ++data.subset_size=0.50 \
     ++data.train_size=0.90 \
     dataset="swot1nadir5"
-    
+
 # ===============================================
 # SIREN (PRETRAINED)
 # ===============================================
@@ -37,7 +37,7 @@ python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
 #    ++logger.mode="offline" \
 #    ++optimizer.learning_rate=1e-5 \
 #    dataset="swot1nadir5"
-    
+
 
 # ===============================================
 # RANDOM FOURIER FEATURES
@@ -64,6 +64,6 @@ python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
 #    pretrained=siren_natl60_full \
 #    ++logger.mode="disabled" \
 #    ++optimizer.learning_rate=5e-5
-    
-    
-    
+
+
+

@@ -4,7 +4,7 @@ fill_nans:
     dims: ["lat", "lon"]
     method: "slinear"
     fill_value: "extrapolate"
-    
+
 spatial_rescale:
     _target_: "oceanbench._src.geoprocessing.spatial.latlon_deg2m"
     _partial_: True
@@ -16,7 +16,7 @@ temporal_rescale:
     t0: "2012-10-22"
     freq_dt: 1
     freq_unit: "D"
-    
+
 psd_isotropic:
     _target_: "oceanbench._src.metrics.power_spectrum.psd_isotropic"
     _partial_: True
@@ -28,7 +28,7 @@ psd_isotropic:
     window_correction: True
     true_amplitude: True
     truncate: True
-    
+
 psd_isotropic_score:
     _target_: "oceanbench._src.metrics.power_spectrum.psd_isotropic_score"
     variable: "ssh"
@@ -40,7 +40,7 @@ psd_isotropic_score:
     window_correction: True
     true_amplitude: True
     truncate: True
-    
+
 psd_spacetime_score:
     _target_: "oceanbench._src.metrics.power_spectrum.psd_spacetime_score"
     variable: "ssh"
@@ -52,7 +52,7 @@ psd_spacetime_score:
     window_correction: True
     true_amplitude: True
     truncate: True
-    
+
 psd_spacetime:
     _target_: "oceanbench._src.metrics.power_spectrum.psd_spacetime"
     _partial_: True
@@ -64,20 +64,20 @@ psd_spacetime:
     window_correction: True
     true_amplitude: True
     truncate: True
-    
+
 psd_isotropic_avg:
     _target_: "oceanbench._src.preprocessing.mean.xr_cond_average"
     _partial_: True
     dims: ["time"]
     drop: True
-    
+
 psd_spacetime_avg:
     _target_: "oceanbench._src.preprocessing.mean.xr_cond_average"
     _partial_: True
     dims: ["lat"]
     drop: True
-    
-    
+
+
 psd_preprocess_chain:
     _target_: "oceanbench._src.data.pipe"
     _partial_: true
@@ -93,7 +93,7 @@ psd_isotropic_chain:
     fns:
         - "${psd_isotropic}" # ISOTROPIC POWER SPECTRUM
         - "${psd_isotropic_avg}" # AVERAGE TIME DIMENSIONS
-        
+
 psd_spacetime_chain:
     _target_: "oceanbench._src.data.pipe"
     _partial_: true

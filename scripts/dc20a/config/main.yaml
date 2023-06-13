@@ -12,8 +12,8 @@ defaults:
     - logger: wandb_jz.yaml
     - pretrained: siren_nadir.yaml
     - results: default.yaml
-    
-    
+
+
 num_epochs: 100
 stage: "train"
 dataset: null

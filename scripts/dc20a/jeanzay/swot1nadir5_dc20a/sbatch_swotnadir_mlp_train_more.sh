@@ -13,8 +13,8 @@
 #SBATCH --error=/gpfsscratch/rech/cli/uvo53rl/errs/nerf4ssh_dc20_swot1nadir5__mlp_%j_batch.err       # name of error file
 #SBATCH --export=ALL
 #SBATCH --signal=SIGUSR1@90
- 
- 
+
+
 # loading of modules
 module purge
 

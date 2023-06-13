@@ -4,8 +4,8 @@ fill_nans:
     dims: ["lat", "lon"]
     method: "slinear"
     fill_value: "extrapolate"
-    
-    
+
+
 domain:
   lat: {_target_: "builtins.slice", _args_: [32., 44.]}
   lon: {_target_: "builtins.slice", _args_: [-66., -54.]}
@@ -18,9 +18,9 @@ select:
     _target_: "xarray.Dataset.sel"
     _partial_: True
     indexers: "${domain}"
-    
+
 resample:
-    method: 
+    method:
         _target_: "xarray.Dataset.resample"
         _partial_: True
         indexer:
@@ -30,7 +30,7 @@ resample:
         _partial_: True
 
 coarsen:
-    method: 
+    method:
         _target_: "xarray.Dataset.coarsen"
         _partial_: True
         dim:
@@ -39,7 +39,7 @@ coarsen:
     aggregate:
         _target_: "xarray.core.rolling.DatasetCoarsen.mean"
         _partial_: True
-        
+
 preprocess_chain_natl60:
     _target_: "oceanbench._src.data.pipe"
     _partial_: true
@@ -61,8 +61,8 @@ preprocess_chain_natl60:
         # SELECT REGION
         - "${select}"
         - {_target_: "xarray.Dataset.sortby", variables: "time", _partial_: True}
-    
-            
+
+
 # NATL60 GULFSTREAM SIMULATION - REDUCED VERSION
 NATL60_GF_1Y1D:
   _target_: "oceanbench._src.data.pipe"
@@ -89,7 +89,7 @@ NATL60_GF_FULL:
     combine: "nested"
     concat_dim: "time"
     decode_times: True
-            
-    
-    
-    
+
+
+
+

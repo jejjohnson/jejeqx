@@ -11,8 +11,6 @@ from collections import defaultdict
 from pathlib import Path
 
 
-
-
 # WANDBLOGGER = pl
 
 
@@ -58,7 +56,7 @@ class TrainerModule:
         self.create_jitted_functions()
         self.state = TrainState(params=model, tx=optimizer)
         self.save_name = save_name
-        
+
     @property
     def model(self):
         return self.state.params
@@ -66,7 +64,6 @@ class TrainerModule:
     @property
     def model_batch(self):
         return jax.vmap(self.state.params)
-    
 
     def create_jitted_functions(self):
         train_step, eval_step, test_step, predict_step = self.create_functions()
@@ -128,14 +125,14 @@ class TrainerModule:
         num_elements = 0
         for batch in dataloader:
             step_metrics = self.eval_step(model, batch)
-            
+
             if isinstance(batch, (list, tuple)):
                 batch_size = batch[0].shape[0]
             elif isinstance(batch, dict):
                 batch_size = list(batch.values())[0].shape[0]
             else:
                 batch_size = batch.shape[0]
-            
+
             for key in step_metrics:
                 metrics[key] += step_metrics[key] * batch_size
 
@@ -144,44 +141,44 @@ class TrainerModule:
             (log_prefix + key): (metrics[key] / num_elements).item() for key in metrics
         }
         return metrics
-    
+
     def test_model(self, dataloader, log_prefix=""):
         metrics = defaultdict(float)
-        
+
         model = self.state.params
         num_elements = 0
         out = list()
         for batch in self.tracker(dataloader, desc="Testing", leave=False):
             pred, step_metrics = self.test_step(model, batch)
-            
+
             if isinstance(batch, (list, tuple)):
                 batch_size = batch[0].shape[0]
             elif isinstance(batch, dict):
                 batch_size = list(batch.values())[0].shape[0]
             else:
                 batch_size = batch.shape[0]
-            
+
             for key in step_metrics:
                 metrics[key] += step_metrics[key] * batch_size
-                
+
             num_elements += batch_size
             out.append(pred)
-            
+
         metrics = {
             (log_prefix + key): (metrics[key] / num_elements).item() for key in metrics
         }
         out = np.vstack(out)
         return out, metrics
-        
+
     def predict_model(self, dataloader, log_prefix=""):
         metrics = defaultdict(float)
-        
+
         model = self.state.params
         num_elements = 0
         out = list()
         for batch in self.tracker(dataloader, desc="Prediction", leave=False):
             pred = self.predict_step(model, batch)
-            
+
             out.append(pred)
 
         out = np.vstack(out)
@@ -196,7 +193,9 @@ class TrainerModule:
                 for epoch_idx in pbar_epoch:
                     self.on_training_epoch_start(epoch_idx)
 
-                    state, train_metrics = self.train_epoch(dm.train_dataloader(), state)
+                    state, train_metrics = self.train_epoch(
+                        dm.train_dataloader(), state
+                    )
 
                     pbar_epoch.set_description(
                         f"Epochs: {epoch_idx} | Loss: {train_metrics['train/loss']:.3e}"
@@ -221,15 +220,14 @@ class TrainerModule:
                             self.save_model()
         except KeyboardInterrupt():
             pass
-        
+
         self.state = state
         self.on_training_end()
         return train_metrics
-    
-    
-    def is_new_model_better(self,
-                            new_metrics : Dict[str, Any],
-                            old_metrics : Dict[str, Any]) -> bool:
+
+    def is_new_model_better(
+        self, new_metrics: Dict[str, Any], old_metrics: Dict[str, Any]
+    ) -> bool:
         """
         Compares two sets of evaluation metrics to decide whether the
         new model is better than the previous ones or not.
@@ -244,17 +242,19 @@ class TrainerModule:
         """
         if old_metrics is None:
             return True
-        for key, is_larger in [('val/val_metric', False), ('val/acc', True), ('val/loss', False)]:
+        for key, is_larger in [
+            ("val/val_metric", False),
+            ("val/acc", True),
+            ("val/loss", False),
+        ]:
             if key in new_metrics:
                 if is_larger:
                     return new_metrics[key] > old_metrics[key]
                 else:
                     return new_metrics[key] < old_metrics[key]
-        assert False, f'No known metrics to log on: {new_metrics}'
-        
-    def save_metrics(self,
-                     filename : str,
-                     metrics : Dict[str, Any]):
+        assert False, f"No known metrics to log on: {new_metrics}"
+
+    def save_metrics(self, filename: str, metrics: Dict[str, Any]):
         """
         Saves a dictionary of metrics to file. Can be used as a textual
         representation of the validation performance for checking in the terminal.
@@ -263,7 +263,7 @@ class TrainerModule:
           filename: Name of the metrics file without folders and postfix.
           metrics: A dictionary of metrics to save in the file.
         """
-        with open(os.path.join(self.log_dir, f'metrics/{filename}.json'), 'w') as f:
+        with open(os.path.join(self.log_dir, f"metrics/{filename}.json"), "w") as f:
             json.dump(metrics, f, indent=4)
 
     def on_training_start(self):
@@ -294,8 +294,8 @@ class TrainerModule:
         state = eqx.tree_deserialise_leaves(f"{name}", self.state)
         self.state = state
 
-    def save_model(self, name: Optional[str]=None):
-        
+    def save_model(self, name: Optional[str] = None):
+
         if name is None:
             name = self.save_name
         from pathlib import Path
@@ -306,4 +306,3 @@ class TrainerModule:
     def load_model(self, name: str):
         params = eqx.tree_deserialise_leaves(f"{name}", self.state.params)
         self.state = eqx.tree_at(lambda x: x.params, self.state, params)
-

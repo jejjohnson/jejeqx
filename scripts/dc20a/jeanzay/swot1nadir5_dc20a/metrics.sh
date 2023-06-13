@@ -17,10 +17,10 @@ python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     evaluation=natl60_dc20a \
     ++logger.mode="disabled" \
     pretrained=ffn_nadir
-    
 
 
-    
+
+
 #python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
 #    stage=train \
 #    num_epochs=1 \

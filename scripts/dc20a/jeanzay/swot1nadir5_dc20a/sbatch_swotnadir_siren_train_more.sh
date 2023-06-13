@@ -44,4 +44,3 @@ srun python /gpfswork/rech/cli/uvo53rl/projects/jejeqx/scripts/dc20a/main.py \
     ++optimizer.learning_rate=1e-5 \
     ++data.train_size=0.90 \
     dataset="swot1nadir5"
-
