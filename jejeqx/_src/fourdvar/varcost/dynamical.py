@@ -18,7 +18,7 @@ class StrongVarCost(VariationalCost):
         return_loss: bool = False,
     ):
         if xb is None:
-            xb = x[0]
+            xb = x
 
         # prior loss
         x = self.prior(x, ts)

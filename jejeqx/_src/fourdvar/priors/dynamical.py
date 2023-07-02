@@ -194,6 +194,8 @@ class Strong4DVar(DynamicalPrior):
 
         # return an array
         x_pred = x_pred.array
+        # print("here!")
+        # print(x_pred.shape, x_pred[:-1].shape, x_gt[1:].shape)
 
         # mean squared error
         loss = jnp.sum((x_pred[:-1] - x_gt[1:]) ** 2)
