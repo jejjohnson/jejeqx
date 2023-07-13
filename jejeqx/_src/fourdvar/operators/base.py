@@ -6,7 +6,7 @@ from jaxtyping import Array
 
 
 class ObsOperator(eqx.Module):
-    operator: tp.Callable
+    operator: eqx.Module
 
     def __init__(self, operator: tp.Callable = Identity):
         self.operator = operator

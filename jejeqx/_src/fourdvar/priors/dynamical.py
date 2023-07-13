@@ -9,6 +9,7 @@ from jejeqx._src.fourdvar.priors.base import Prior
 
 Solver = dfx.AbstractSolver
 StepSize = dfx.AbstractAdaptiveStepSizeController
+Adjoint = dfx.AbstractAdjoint
 
 
 class DynamicalPrior(Prior):
@@ -16,6 +17,7 @@ class DynamicalPrior(Prior):
     model: tp.Callable
     solver: Solver
     stepsize: StepSize
+    adjoint: Adjoint
 
     def __init__(
         self,
@@ -23,11 +25,13 @@ class DynamicalPrior(Prior):
         model: tp.Callable,
         solver: Solver = dfx.Tsit5(),
         stepsize: StepSize = dfx.PIDController(rtol=1e-5, atol=1e-5),
+        adjoint: Adjoint = dfx.RecursiveCheckpointAdjoint(),
     ):
         self.params = params
         self.model = model
         self.solver = solver
         self.stepsize = stepsize
+        self.adjoint = adjoint
 
     def init_state(self, x: PyTree) -> PyTree:
         raise NotImplementedError()
@@ -54,6 +58,7 @@ class DynamicalPrior(Prior):
         sol = dfx.diffeqsolve(
             terms=dfx.ODETerm(self.model),
             solver=self.solver,
+            adjoint=self.adjoint,
             t0=t0,
             t1=t1,
             dt0=dt,
