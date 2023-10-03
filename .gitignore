@@ -148,3 +148,4 @@ datasets/*
 *.idea
 \.idea/
 \notebooks/dev/nerfs/figures/
+*.hdf

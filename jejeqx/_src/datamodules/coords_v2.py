@@ -8,14 +8,14 @@ from jejeqx._src.datasets import SpatioTempDataset
 from jejeqx._src.dataloaders import NumpyLoader
 from jejeqx._src.transforms.spatial import validate_lon, validate_lat, latlon_deg2m
 from jejeqx._src.transforms.temporal import decode_cf_time, validate_time, time_rescale
-from jejeqx._src.types.xrdata import (
-    Bounds,
-    Period,
-    TimeAxis,
-    LongitudeAxis,
-    LatitudeAxis,
-    Grid2DT,
-)
+# from jejeqx._src.types.xrdata import (
+#     Bounds,
+#     Period,
+#     TimeAxis,
+#     LongitudeAxis,
+#     LatitudeAxis,
+#     Grid2DT,
+# )
 from sklearn.model_selection import train_test_split
 from dask.array.core import PerformanceWarning
 from xarray_dataclasses import asdataset
